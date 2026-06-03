@@ -15,7 +15,7 @@ export { asyncHandler }
 
 
 
-
+//Another way of making it
 //This is a wrapper function made with async await which we gonna use everywhere in code
 // const asyncHandler = (fn) => async (req, res, next) => { //Higer Order Function
 //     try {

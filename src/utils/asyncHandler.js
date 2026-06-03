@@ -2,7 +2,7 @@
 //The wrapper function lets you write error-handling logic once and reuse it for all async routes, making your code cleaner, shorter, and easier to maintain.
 //This is a wrapper function made with Promisses which we gonna use everywhere in code
 const asyncHandler = (requestHandler) => {
-    (req, res, next) => {
+    return (req, res, next) => {
         Promise.resolve(requestHandler(req, res, next)).catch((err) => next(err))
     }
 }

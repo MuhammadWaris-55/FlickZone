@@ -45,4 +45,8 @@ const videoSchema = new Schema(
 
 
 videoSchema.plugin(mongooseAggregatePaginate) //By using this we can write the aggregation querries in MongoDB
+// YouTube shows "Page 1, 2, 3..." or loads more videos as you scroll?
+//That's pagination.
+//Doing pagination manually with aggregation is annoying. This plugin does it for you automatically.
+
 export const Video = mongoose.model("Video" , videoSchema)

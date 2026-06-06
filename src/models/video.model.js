@@ -44,5 +44,5 @@ const videoSchema = new Schema(
 )
 
 
-videoSchema.plugin(mongooseAggregatePaginate)
+videoSchema.plugin(mongooseAggregatePaginate) //By using this we can write the aggregation querries in MongoDB
 export const Video = mongoose.model("Video" , videoSchema)

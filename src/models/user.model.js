@@ -54,8 +54,8 @@ const userSchema = new Schema(
 //using "next" because we r using middleware
 
 userSchema.pre("save", async function (next) {
-    //using if condtion to avoid to run this hook everytime on every save , now this will only run if password is modified 
-    if (this.isModified("password")) {
+  //using if condtion to avoid to run this hook everytime on every save , now this will only run if password is modified 
+  if (this.isModified("password")) {
     this.password = bcrypt.hash(this.password, 10);
   }
   next();
@@ -63,40 +63,40 @@ userSchema.pre("save", async function (next) {
 
 //Making a custom method to ask from user that password is correct?
 userSchema.methods.isPasswordCorrect = async function (password) {
-    return await bcrypt.compare(password , this.password)
+  return await bcrypt.compare(password, this.password)
 }
 
 //Making Another custom method to generate the Access token
-userSchema.methods.generateAccessToken = function(){
+userSchema.methods.generateAccessToken = function () {
     return jwt.sign(
-        {
-            //payload
-            _id = this._id,
-            email = this.email,
-            username = this.username,
-            fullname = this.fullname
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        {
-            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
-        }
-    )
+      {
+        //payload
+        _id = this._id,
+        email = this.email,
+        username = this.username,
+        fullname = this.fullname
+      },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+    }
+  )
 }
 
 //Making Another custom method to generate the Refresh token
-userSchema.methods.generateRefreshToken = function(){
-      return jwt.sign(
-        {
-            //payload
-            _id = this._id,
-            email = this.email,
-            username = this.username,
-            fullname = this.fullname
-        },
-        process.env.REFRESH_TOKEN_SECRET,
-        {
-            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
-        }
+userSchema.methods.generateRefreshToken = function () {
+  return jwt.sign(
+      {
+        //payload
+        _id = this._id,
+        email = this.email,
+        username = this.username,
+        fullname = this.fullname
+      },
+      process.env.REFRESH_TOKEN_SECRET,
+      {
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+      }
     )
 }
 

@@ -85,7 +85,19 @@ userSchema.methods.generateAccessToken = function(){
 
 //Making Another custom method to generate the Refresh token
 userSchema.methods.generateRefreshToken = function(){
-
+      return jwt.sign(
+        {
+            //payload
+            _id = this._id,
+            email = this.email,
+            username = this.username,
+            fullname = this.fullname
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+        }
+    )
 }
 
 export const User = mongoose.model("User", userSchema);

@@ -32,9 +32,10 @@ app.use(cookieParser()) //the work of cookie parser is that we can access cookie
 
 
 //import Routes
-import UserRouter from "./routes/user.route.js";
+import userRouter from "./routes/user.route.js";
 
 //routes declaration
-app.use("/users" , UserRouter) //using app.use because router is in another file
+app.use("/users" , userRouter) //using app.use because router is in another file
+//if we go to /users it will redirect us to userRouter
 
 export { app }

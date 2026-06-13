@@ -30,4 +30,11 @@ app.use(cookieParser()) //the work of cookie parser is that we can access cookie
 //A cookie is a small piece of data the server sends to the client, which the browser stores and automatically sends back with every subsequent request to that server.
 // A cookie is just a small text file the server tells your browser to save.
 
+
+//import Routes
+import router from "./routes/user.route.js";
+
+//routes declaration
+app.use("/users" , router) //using app.use because router is in another file
+
 export { app }

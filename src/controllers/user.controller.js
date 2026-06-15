@@ -34,6 +34,8 @@ const registerUser = asyncHandler(async (req, res) => {
     if (existedUser) {
         throw new ApiError(409, "User with username or email already exist")
     }
+
+    // check for images, avatar
 })
 
 export { registerUser }

@@ -56,7 +56,7 @@ const userSchema = new Schema(
 userSchema.pre("save", async function (next) {
   //using if condtion to avoid to run this hook everytime on every save , now this will only run if password is modified 
   if (this.isModified("password")) {
-    this.password = bcrypt.hash(this.password, 10);
+    this.password = await bcrypt.hash(this.password, 10);
   }
   next();
 });

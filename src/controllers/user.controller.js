@@ -39,6 +39,11 @@ const registerUser = asyncHandler(async (req, res) => {
     //this means If files were uploaded, and if there's an avatar, give me the local disk path of the first one
     const avatarLocalPath = req.files?.avatar[0]?.path
     const coverImageLocalPath = req.files?.coverImage[0]?.path
+
+    //check for avatar
+    if (!avatarLocalPath) {
+        throw new ApiError(400, "Avatar file is required")
+    }
     
 })
 

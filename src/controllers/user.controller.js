@@ -65,6 +65,17 @@ const registerUser = asyncHandler(async (req, res) => {
         username: username.toLowerCase()
     })
 
+    //remove password and refresh token field from response
+    const createdUser = await User.findById(user._id).select(
+        //in this method all fields selected by default so "-" means unselect it
+        "-password -refreshToken"
+    )
+
+    // check for user creation
+    if (!createdUser) {
+        throw new ApiError(500, "Something went wrong while regitering the user")
+    }
+
 })
 
 export { registerUser }

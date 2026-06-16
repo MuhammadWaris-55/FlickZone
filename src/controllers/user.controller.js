@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js"
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import{ ApiResponse } from "../utils/ApiResponse.js"
 
 const registerUser = asyncHandler(async (req, res) => {
     //To write the logic of registration of user we have to make some steps to solve this problem
@@ -13,7 +14,7 @@ const registerUser = asyncHandler(async (req, res) => {
     //create user object - create entry in DB
     //remove password and refresh token field from response
     //check for user creation
-    //if user created return response, if not send a error
+    //return response
 
 
     //Getting user details
@@ -75,6 +76,11 @@ const registerUser = asyncHandler(async (req, res) => {
     if (!createdUser) {
         throw new ApiError(500, "Something went wrong while regitering the user")
     }
+
+    //return res
+    return res.status(201).json(
+        new ApiResponse(200, createdUser, "User registered Successfully")
+    )
 
 })
 

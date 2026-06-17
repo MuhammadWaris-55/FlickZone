@@ -39,7 +39,7 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(409, "User with username or email already exist")
     }
 
-    // console.log(req.files)
+    console.log(req.files)
 
     // check for images, avatar , we got req.files from multer(middleware)
     //this means If files were uploaded, and if there's an avatar, give me the local disk path of the first one

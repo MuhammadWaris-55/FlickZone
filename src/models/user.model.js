@@ -53,13 +53,16 @@ const userSchema = new Schema(
 //"save" means the logic we r writing in the function will execute just right before saving the data
 //using "next" because we r using middleware
 
-userSchema.pre("save", async function (next) {
-  //using if condtion to avoid to run this hook everytime on every save , now this will only run if password is modified 
-  if (this.isModified("password")) {
-    this.password = await bcrypt.hash(this.password, 10);
-  }
-  next();
-});
+// userSchema.pre("save", async function (next) {
+//   //using if condtion to avoid to run this hook everytime on every save , now this will only run if password is modified 
+//    if(!this.isModified("password")) return next();
+//    this.password = await bcrypt.hash(this.password, 10)
+//     next()
+// });
+userSchema.pre("save", async function () {
+    if (!this.isModified("password")) return
+    this.password = await bcrypt.hash(this.password, 10)
+})
 
 //Making a custom method to ask from user that password is correct?
 userSchema.methods.isPasswordCorrect = async function (password) {

@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import{ ApiResponse } from "../utils/ApiResponse.js"
 
+
 const registerUser = asyncHandler(async (req, res) => {
     //To write the logic of registration of user we have to make some steps to solve this problem
     //get user details from frontend
@@ -29,7 +30,7 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     // check if user already exist
-    const existedUser = User.findOne({
+    const existedUser = await User.findOne({
         $or: [{ username } , { email }]
     })
 
@@ -39,8 +40,8 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // check for images, avatar , we got req.files from multer(middleware)
     //this means If files were uploaded, and if there's an avatar, give me the local disk path of the first one
-    const avatarLocalPath = req.files?.avatar[0]?.path
-    const coverImageLocalPath = req.files?.coverImage[0]?.path
+   const avatarLocalPath = req.files?.avatar?.[0]?.path
+    const coverImageLocalPath = req.files?.coverImage?.[0]?.path  
 
     //check for avatar
     if (!avatarLocalPath) {

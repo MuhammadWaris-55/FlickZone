@@ -21,6 +21,7 @@ const registerUser = asyncHandler(async (req, res) => {
     //Getting user details
     const {fullname, email, username, password} = req.body
     console.log("email: " , email);
+    // console.log(req.body)
 
     //Validation check
     if (
@@ -37,6 +38,8 @@ const registerUser = asyncHandler(async (req, res) => {
     if (existedUser) {
         throw new ApiError(409, "User with username or email already exist")
     }
+
+    // console.log(req.files)
 
     // check for images, avatar , we got req.files from multer(middleware)
     //this means If files were uploaded, and if there's an avatar, give me the local disk path of the first one

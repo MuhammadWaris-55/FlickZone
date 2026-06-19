@@ -114,6 +114,10 @@ const loginUser = asyncHandler( async (req, res) => {
     const user = await User.findOne({
         $or: [{username}, {email}]
     })
+
+    if (!user) {
+        throw new ApiError(404, "User does not exist")
+    }
 })
 
 export { 

@@ -95,7 +95,13 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler( async (req, res) => {
     //To write the logic of user login we have to make some steps to solve this problem
-    
+    //get data from req.body
+    //take username or email
+    //find the user 
+    //if user found check password
+    //if password correct generate & send access and refresh token to user
+    //send secure cookie
+    //return response
 })
 
 export { 

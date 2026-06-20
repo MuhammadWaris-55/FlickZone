@@ -150,6 +150,29 @@ const loginUser = asyncHandler( async (req, res) => {
     //access and refresh token 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
 
+    //send secure cookie
+    const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
+
+    //by doing this cookies will only be modified by server not from anyone on frontend
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+        new ApiResponse(
+            200,
+            {
+                user: loggedInUser, accessToken, refreshToken
+            },
+            "User Logged In Successfully"
+        )
+    )
+
 })
 
 export { 

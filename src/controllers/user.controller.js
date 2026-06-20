@@ -8,11 +8,16 @@ import{ ApiResponse } from "../utils/ApiResponse.js"
 //we will do this things many times in our code thats why putting it in a method
 const generateAccessAndRefreshTokens = async(userId) => {
     try {
+        // Fetch the user document from the database using their ID
         const user = await User.findById(userId)
+
         const accessToken = user.generateAccessToken()
         const refreshToken = user.generateRefreshToken()
 
+        // Store the refresh token in DB
         user.refreshToken = refreshToken
+        
+        // Save the updated user document
         await user.save({ validateBeforeSave: false })
 
         return { accessToken, refreshToken }

@@ -5,6 +5,22 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import{ ApiResponse } from "../utils/ApiResponse.js"
 
 
+//we will do this things many times in our code thats why putting it in a method
+const generateAccessAndRefreshTokens = async(userId) => {
+    try {
+        const user = await User.findById(userId)
+        const accessToken = user.generateAccessToken()
+        const refreshToken = user.generateRefreshToken()
+
+        user.refreshToken = refreshToken
+        await user.save({validateBeforeSave: false})
+
+        return {accessToken, refreshToken}
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while generating Access and Refresh tokens")
+    }
+}
+
 const registerUser = asyncHandler(async (req, res) => {
     //To write the logic of registration of user we have to make some steps to solve this problem
     //get user details from frontend
@@ -125,6 +141,10 @@ const loginUser = asyncHandler( async (req, res) => {
     if (!isPasswordValid) {
         throw new ApiError(401, "Password is incorrect")
     }
+
+    //access and refresh token 
+
+
 })
 
 export { 

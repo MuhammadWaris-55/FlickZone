@@ -16,7 +16,7 @@ const generateAccessAndRefreshTokens = async(userId) => {
 
         // Store the refresh token in DB
         user.refreshToken = refreshToken
-        
+
         // Save the updated user document
         await user.save({ validateBeforeSave: false })
 
@@ -148,7 +148,7 @@ const loginUser = asyncHandler( async (req, res) => {
     }
 
     //access and refresh token 
-
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
 
 })
 

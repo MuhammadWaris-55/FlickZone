@@ -2,11 +2,11 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js"
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
-import{ ApiResponse } from "../utils/ApiResponse.js"
+import { ApiResponse } from "../utils/ApiResponse.js"
 
 
 //we will do this things many times in our code thats why putting it in a method
-const generateAccessAndRefreshTokens = async(userId) => {
+const generateAccessAndRefreshTokens = async (userId) => {
     try {
         // Fetch the user document from the database using their ID
         const user = await User.findById(userId)
@@ -40,7 +40,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 
     //Getting user details
-    const {fullname, email, username, password} = req.body
+    const { fullname, email, username, password } = req.body
     // console.log("email: " , email);
     // console.log(req.body)
 
@@ -53,7 +53,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // check if user already exist
     const existedUser = await User.findOne({
-        $or: [{ username } , { email }]
+        $or: [{ username }, { email }]
     })
 
     if (existedUser) {
@@ -64,12 +64,12 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // check for images, avatar , we got req.files from multer(middleware)
     //this means If files were uploaded, and if there's an avatar, give me the local disk path of the first one
-   const avatarLocalPath = req.files?.avatar?.[0]?.path
+    const avatarLocalPath = req.files?.avatar?.[0]?.path
     // const coverImageLocalPath = req.files?.coverImage?.[0]?.path 
-    
+
     let coverImageLocalPath;
     if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
-      coverImageLocalPath = req.files.coverImage[0].path  
+        coverImageLocalPath = req.files.coverImage[0].path
     }
 
     //check for avatar
@@ -114,7 +114,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 })
 
-const loginUser = asyncHandler( async (req, res) => {
+const loginUser = asyncHandler(async (req, res) => {
     //To write the logic of user login we have to make some steps to solve this problem
     //get data from req.body
     //take username or email
@@ -125,15 +125,15 @@ const loginUser = asyncHandler( async (req, res) => {
     //return response
 
 
-    const {username, email, password} = req.body
+    const { username, email, password } = req.body
 
-    if (!username || !email) {
+    if (!(username || email)) {
         throw new ApiError(400, "username or email is required")
     }
 
     //checking what we got email or username
     const user = await User.findOne({
-        $or: [{username}, {email}]
+        $or: [{ username }, { email }]
     })
 
     if (!user) {
@@ -160,22 +160,22 @@ const loginUser = asyncHandler( async (req, res) => {
     }
 
     return res
-    .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
-    .json(
-        new ApiResponse(
-            200,
-            {
-                user: loggedInUser, accessToken, refreshToken
-            },
-            "User Logged In Successfully"
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    user: loggedInUser, accessToken, refreshToken
+                },
+                "User Logged In Successfully"
+            )
         )
-    )
 
 })
 
-const logoutUser = asyncHandler( async (req, res) => {
+const logoutUser = asyncHandler(async (req, res) => {
     // Find the logged-in user and remove their refresh token from the DB
     await User.findByIdAndUpdate(
         req.user._id,
@@ -189,20 +189,20 @@ const logoutUser = asyncHandler( async (req, res) => {
         }
     )
 
-     const options = {
+    const options = {
         httpOnly: true,
         secure: true
     }
 
     // Send success response and clear both cookies from the browser
     return res
-    .status(200)
-    .clearCookie("accessToken", options)
-    .clearCookie("refreshToken", options)
-    .json(new ApiResponse(200, {}, "User Logged Out"))
+        .status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(new ApiResponse(200, {}, "User Logged Out"))
 })
 
-export { 
+export {
     registerUser,
     loginUser,
     logoutUser

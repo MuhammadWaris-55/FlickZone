@@ -176,6 +176,7 @@ const loginUser = asyncHandler( async (req, res) => {
 })
 
 const logoutUser = asyncHandler( async (req, res) => {
+    // Find the logged-in user and remove their refresh token from the DB
     await User.findByIdAndUpdate(
         req.user._id,
         {
@@ -193,6 +194,7 @@ const logoutUser = asyncHandler( async (req, res) => {
         secure: true
     }
 
+    // Send success response and clear both cookies from the browser
     return res
     .status(200)
     .clearCookie("accessToken", options)

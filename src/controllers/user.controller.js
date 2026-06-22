@@ -185,7 +185,7 @@ const logoutUser = asyncHandler(async (req, res) => {
             }
         },
         {
-            new: true
+             returnDocument: 'after'
         }
     )
 

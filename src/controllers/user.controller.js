@@ -204,6 +204,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 })
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
+    // Extract refresh token from cookies (browsers) or request body (mobile/API clients)
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
 
     if (!incomingRefreshToken) {
@@ -211,17 +212,21 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     }
 
     try {
+        // Verify the token's signature and expiry using the refresh token secret
         const decodedToken = jwt.verify(
             incomingRefreshToken,
             process.env.REFRESH_TOKEN_SECRET
         )
 
+        // Use the _id embedded in the decoded token to find the user in DB
         const user = await User.findById(decodedToken?._id)
 
         if (!user) {
             throw new ApiError(401, "Invalid Refresh Token")
         }
 
+        // Compare incoming token with the one stored in DB
+        // If they don't match, the token was already used or is stolen 
         if (incomingRefreshToken !== user?.refreshToken) {
             throw new ApiError(401, "Refresh token is expired or used")
         }
@@ -231,8 +236,11 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             secure: true
         }
 
+        // Generate a fresh access token and a new refresh token (old one gets replaced in DB)
         const { accessToken, newRefreshToken } = await generateAccessAndRefreshTokens(user._id)
 
+        // Send new tokens back via secure cookies and also in the JSON body
+        // Cookies: for browsers | JSON body: for mobile/API clients that can't use cookies
         return res
             .status(200)
             .cookie("accessToken", accessToken, options)

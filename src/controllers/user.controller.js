@@ -261,14 +261,20 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 const changeCurrentPassword = asyncHandler(async (req, res) => {
     const {oldPassword, newPassword} = req.body
 
+    // Find the currently logged-in user from DB using their id (attached to req by auth middleware)
     const user = await User.findById(req.user?.id)
+
+    // Check if the provided old password matches the hashed password stored in DB
     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
 
     if (!isPasswordCorrect) {
         throw new ApiError(400, "Invalid old password")
     }
 
+    // Set the new password on the user object (will be hashed by the pre-save hook in User model)
     user.password = newPassword
+
+    // Save to DB — validateBeforeSave: false skips schema validation since we only changed the password
     user.save({validateBeforeSave: false})
 
     return res

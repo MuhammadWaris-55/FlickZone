@@ -262,7 +262,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     const {oldPassword, newPassword} = req.body
 
     // Find the currently logged-in user from DB using their id (attached to req by auth middleware)
-    const user = await User.findById(req.user?.id)
+    const user = await User.findById(req.user?._id)
 
     // Check if the provided old password matches the hashed password stored in DB
     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
@@ -289,7 +289,22 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 })
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
-    
+    const {fullname, email} = req.body
+
+    if (!fullname || !email) {
+        throw new ApiError(400, "All fields are required")
+    }
+
+    const user = User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set: {
+                fullname,
+                email
+            }
+        },
+        {new: true}
+    ).select("-password")
 })
 
 

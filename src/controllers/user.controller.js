@@ -275,7 +275,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     user.password = newPassword
 
     // Save to DB — validateBeforeSave: false skips schema validation since we only changed the password
-    user.save({validateBeforeSave: false})
+    await user.save({validateBeforeSave: false})
 
     return res
     .status(200)

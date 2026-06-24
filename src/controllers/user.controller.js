@@ -288,6 +288,10 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     .json(200, req.user, "Current user fetched successfully")
 })
 
+const updateAccountDetails = asyncHandler(async (req, res) => {
+    
+})
+
 
 export {
     registerUser,

@@ -347,23 +347,28 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 })
 
 const updateUserCoverImage = asyncHandler(async (req, res) => {
+    // Get the local path of the uploaded Cover Image file from multer
     const coverImageLocalPath = req.file?.path
 
+    // Validate that a file was actually uploaded
     if (!coverImageLocalPath) {
         throw new ApiError(400, "Cover Image file is missing")
     }
 
+    // Upload the local file to Cloudinary and get the result
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
 
+    // Validate that Cloudinary returned a valid URL
     if (!coverImage.url) {
         throw new ApiError(400, "Error while uploading Cover Image")
     }
 
+    // Find the logged-in user by ID and update their Cover Image URL
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set: {
-                coverImage: coverImage.url
+                coverImage: coverImage.url // Store only the Cloudinary URL, not the local path
             }
         },
         {new: true}

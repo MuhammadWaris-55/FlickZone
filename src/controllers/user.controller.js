@@ -259,7 +259,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 })
 
 const changeCurrentPassword = asyncHandler(async (req, res) => {
-    const {oldPassword, newPassword} = req.body
+    const { oldPassword, newPassword } = req.body
 
     // Find the currently logged-in user from DB using their id (attached to req by auth middleware)
     const user = await User.findById(req.user?._id)
@@ -275,21 +275,21 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     user.password = newPassword
 
     // Save to DB — validateBeforeSave: false skips schema validation since we only changed the password
-    await user.save({validateBeforeSave: false})
+    await user.save({ validateBeforeSave: false })
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, {}, "Password changed successfully"))
+        .status(200)
+        .json(new ApiResponse(200, {}, "Password changed successfully"))
 })
 
 const getCurrentUser = asyncHandler(async (req, res) => {
     return res
-    .status(200)
-    .json(new ApiResponse(200, req.user, "Current user fetched successfully"))
+        .status(200)
+        .json(new ApiResponse(200, req.user, "Current user fetched successfully"))
 })
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
-    const {fullname, email} = req.body
+    const { fullname, email } = req.body
 
     if (!fullname || !email) {
         throw new ApiError(400, "All fields are required")
@@ -304,13 +304,13 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
                 email
             }
         },
-    // { new: true } returns the updated document instead of the old one
-        {new: true}
+        // { new: true } returns the updated document instead of the old one
+        { new: true }
     ).select("-password")
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, user, "Account details updated successfully"))
+        .status(200)
+        .json(new ApiResponse(200, user, "Account details updated successfully"))
 })
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
@@ -338,12 +338,12 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
                 avatar: avatar.url // Store only the Cloudinary URL, not the local path
             }
         },
-        {new: true}
+        { new: true }
     ).select("-password")
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, user, "Avatar updated successfully"))
+        .status(200)
+        .json(new ApiResponse(200, user, "Avatar updated successfully"))
 })
 
 const updateUserCoverImage = asyncHandler(async (req, res) => {
@@ -371,12 +371,12 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
                 coverImage: coverImage.url // Store only the Cloudinary URL, not the local path
             }
         },
-        {new: true}
+        { new: true }
     ).select("-password")
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, user, "Cover Image updated successfully"))
+        .status(200)
+        .json(new ApiResponse(200, user, "Cover Image updated successfully"))
 })
 
 

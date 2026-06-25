@@ -314,23 +314,28 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 })
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
+    // Get the local path of the uploaded avatar file from multer
     const avatarLocalPath = req.file?.path
 
+    // Validate that a file was actually uploaded
     if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar file is missing")
     }
 
+    // Upload the local file to Cloudinary and get the result
     const avatar = await uploadOnCloudinary(avatarLocalPath)
 
+    // Validate that Cloudinary returned a valid URL
     if (!avatar.url) {
         throw new ApiError(400, "Error while uploading avatar")
     }
 
+    // Find the logged-in user by ID and update their avatar URL
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set: {
-                avatar: avatar.url
+                avatar: avatar.url // Store only the Cloudinary URL, not the local path
             }
         },
         {new: true}

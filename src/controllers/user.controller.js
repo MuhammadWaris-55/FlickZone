@@ -295,6 +295,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         throw new ApiError(400, "All fields are required")
     }
 
+    // Find the logged-in user by ID and update their fullname and email
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
@@ -303,6 +304,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
                 email
             }
         },
+    // { new: true } returns the updated document instead of the old one
         {new: true}
     ).select("-password")
 

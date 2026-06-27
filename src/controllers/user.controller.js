@@ -391,6 +391,14 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
             $match: {
                 username: username?.toLowerCase()
             }
+        },
+        {
+            $lookup: {
+                from: "subscriptions",
+                localField: "_id",
+                foreignField: "channel",
+                as: "subscribers"
+            }
         }
     ])
 })

@@ -380,18 +380,24 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 })
 
 const getUserChannelProfile = asyncHandler(async (req, res) => {
+    // Extract username from the URL params (e.g. /channel/waris → "waris")
     const {username} = req.params
 
     if (!username?.trim()) {
         throw new ApiError(400, "Username is missing")
     }
 
+    // Run aggregation pipeline on the User collection
     const channel = await User.aggregate([
+        // STAGE 1: Find the user whose username matches the one in the URL
         {
             $match: {
-                username: username?.toLowerCase()
+                username: username?.toLowerCase() // lowercase to make search case-insensitive
             }
         },
+        // STAGE 2: Find all subscribers of this channel
+        // Go to "subscriptions" collection and get all docs where "channel" = this user's _id
+        // These are the people who subscribed to this channel
         {
             $lookup: {
                 from: "subscriptions",
@@ -400,6 +406,9 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                 as: "subscribers"
             }
         },
+        // STAGE 3: Find all channels this user has subscribed to
+        // Same collection, opposite direction — where "subscriber" = this user's _id
+        // These are the channels this user follows
         {
             $lookup: {
                 from: "subscriptions",
@@ -408,14 +417,19 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                 as: "subscribedTo"
             }
         },
+        // STAGE 4: Compute new fields from the data we just looked up
         {
             $addFields: {
+                // Count how many people are in the subscribers array
                 subscribersCount: {
                     $size: "$subscribers"
                 },
+                // Count how many channels this user subscribes to
                 channelsSubscribedToCount: {
                     $size: "$subscribedTo"
                 },
+                // Check if the currently logged-in user is in the subscribers list
+                // If yes → they are subscribed, if no → they are not
                 isSubscribed: {
                     $cond: {
                         if: {$in: [req.user?._id, "$subscribers.subscriber"]},
@@ -425,6 +439,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                 }
             }
         },
+        // STAGE 5: Shape the final output — only send what the frontend needs
         {
             $project: {
                 fullname: 1,
@@ -440,10 +455,13 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         }
     ])
 
+    // aggregate() always returns an array — if it's empty, the channel doesn't exist
     if (!channel?.length) {
         throw new ApiError(404, "Channel does not exist")
     }
 
+    // Send back channel[0] because aggregate returns an array
+    // but we only matched one user, so the data is at index 0
     return res
     .status(200)
     .json(

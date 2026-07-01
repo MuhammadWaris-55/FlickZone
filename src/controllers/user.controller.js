@@ -496,7 +496,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                 // on each video to also fetch its owner's info
                 pipeline: [
                     {
-                        // for each video, find who uploaded it (the owner)
+                        // nested lookup: get the owner (uploader) of each video
                         $lookup: {
                             from: "users",
                             localField: "owner", // the owner's ID stored on the video

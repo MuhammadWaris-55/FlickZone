@@ -472,27 +472,40 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 })
 
 const getWatchHistory = asyncHandler(async (req, res) => {
+    // req.user._id is a string, but aggregation pipelines don't auto-cast 
+    // types like normal Mongoose queries do — so we manually wrap it 
+    // in mongoose.Types.ObjectId to make sure $match actually finds the user
     const user = await User.aggregate([
         {
+            // Stage 1: find the currently logged-in user by their _id
             $match: {
                 _id: new mongoose.Types.ObjectId(req.user._id)
             }
         },
         {
+            // Stage 2: right now watchHistory is just a list of video IDs.
+            // This joins with the "videos" collection to turn those IDs 
+            // into full video details (title, thumbnail, etc.)
             $lookup: {
-                from: "videos",
-                localField: "watchHistory",
-                foreignField: "_id",
-                as: "watchHistory",
+                from: "videos", // which collection to look into
+                localField: "watchHistory", // the list of video IDs we already have on the user
+                foreignField: "_id", // match those IDs to the "_id" field in videos
+                as: "watchHistory", // put the results back into watchHistory (replacing the IDs)
+
+                //sub-pipeline before attaching the video data
+                // on each video to also fetch its owner's info
                 pipeline: [
                     {
+                        // for each video, find who uploaded it (the owner)
                         $lookup: {
                             from: "users",
-                            localField: "owner",
-                            foreignField: "_id",
+                            localField: "owner", // the owner's ID stored on the video
+                            foreignField: "_id", // match it to "_id" in the users collection
                             as: "owner",
                             pipeline: [
                                 {
+                                    // only expose safe, public fields — 
+                                    // keeps password/refreshToken etc. out of the response
                                     $project: {
                                         fullname: 1,
                                         username: 1,
@@ -503,6 +516,9 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                         }
                     },
                     {
+                        // $lookup always returns an array, even for a single match.
+                        // Since a video has exactly one owner, unwrap the array 
+                        // into a plain object using $first (same as $arrayElemAt: [$owner, 0])
                         $addFields: {
                             owner: {
                                 $first: "$owner"
@@ -514,6 +530,9 @@ const getWatchHistory = asyncHandler(async (req, res) => {
         }
     ])
 
+    // aggregate() always returns an array of matched docs, unlike findById()
+    // which returns a single document. Since _id is unique, there's only 
+    // ever one match, so we grab it with user[0]
     return res
     .status(200)
     .json(

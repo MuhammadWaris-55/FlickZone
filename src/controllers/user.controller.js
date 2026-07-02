@@ -456,8 +456,6 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
         }
     ])
 
-    console.log(channel)
-
     // aggregate() always returns an array — if it's empty, the channel doesn't exist
     if (!channel?.length) {
         throw new ApiError(404, "Channel does not exist")

@@ -11,7 +11,9 @@ const tweetSchema = new Schema(
             required: true
         }
     },
-    {timestamps: true}
+    {
+        timestamps: true
+    }
 )
 
 

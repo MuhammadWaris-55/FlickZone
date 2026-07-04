@@ -19,7 +19,9 @@ const likeSchema = new Schema(
             ref: "Tweet"
         }
     },
-    {timestamps: true}
+    {
+        timestamps: true
+    }
 )
 
 

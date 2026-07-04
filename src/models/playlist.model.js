@@ -19,7 +19,9 @@ const playlistSchema = new Schema(
             ref: "User"
         }
     },
-    {timestamps: true}
+    {
+        timestamps: true
+    }
 )
 
 

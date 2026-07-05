@@ -29,7 +29,6 @@ const generateAccessAndRefreshTokens = async (userId) => {
 }
 
 const registerUser = asyncHandler(async (req, res) => {
-    //To write the logic of registration of user we have to make some steps to solve this problem
     //get user details from frontend
     //check validation - not empty (or password and email in correct format)
     //check if user already exist (we can check from username and email)
@@ -117,7 +116,6 @@ const registerUser = asyncHandler(async (req, res) => {
 })
 
 const loginUser = asyncHandler(async (req, res) => {
-    //To write the logic of user login we have to make some steps to solve this problem
     //get data from req.body
     //take username or email
     //find the user 

@@ -530,6 +530,8 @@ const getWatchHistory = asyncHandler(async (req, res) => {
         }
     ])
 
+    // console.log(user)
+
     // aggregate() always returns an array of matched docs, unlike findById()
     // which returns a single document. Since _id is unique, there's only 
     // ever one match, so we grab it with user[0]

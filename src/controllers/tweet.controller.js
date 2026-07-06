@@ -65,8 +65,8 @@ const getUserTweets = asyncHandler(async (req, res) => {
         },
         {
             $addFields: {
-                owner: {
-                    $first: "$owner"
+                ownerDetails: {
+                    $first: "$ownerDetails"
                 }
             }
         },
@@ -116,7 +116,7 @@ const updateTweet = asyncHandler(async (req, res) => {
         }
     )
 
-    if (!updateTweet) {
+    if (!updatedTweet) {
         throw new ApiError(500, "Something went wrong while updating the tweet")
     }
 
@@ -142,7 +142,7 @@ const deleteTweet = asyncHandler(async (req, res) => {
         throw new ApiError(403, "You are not authorized to delete this tweet")
     }
 
-    const deletedTweet = await Tweet.findByIdAndDelete(tweet)
+    const deletedTweet = await Tweet.findByIdAndDelete(tweetId)
 
     return res
     .status(200)

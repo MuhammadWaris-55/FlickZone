@@ -33,7 +33,7 @@ app.use(cookieParser()) //the work of cookie parser is that we can access cookie
 
 //import Routes
 import userRouter from "./routes/user.route.js";
-import tweetRouter from "./routes/tweet.routes.js"
+import tweetRouter from "./routes/tweet.route.js"
 
 //routes declaration
 app.use("/api/v1/users" , userRouter) //using app.use because router is in another file

@@ -7,12 +7,14 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 
 const createTweet = asyncHandler(async (req, res) => {
 
+    // extract tweet content
     const { content } = req.body
 
     if (!content || content.trim() === "") {
         throw new ApiError(400, "Content is required")
     }
 
+    // create tweet document, linking it to the logged in user
     const tweet = await Tweet.create({
         content,
         owner: req.user?._id
@@ -28,8 +30,10 @@ const createTweet = asyncHandler(async (req, res) => {
 })
 
 const getUserTweets = asyncHandler(async (req, res) => {
+    // get userId whose tweets we want to fetch
     const { userId } =  req.params
 
+    // validate the userId is a proper mongoDB ObjectId
     if (!isValidObjectId(userId)) {
         throw new ApiError(400, "Invalid user id")
     }
@@ -40,13 +44,16 @@ const getUserTweets = asyncHandler(async (req, res) => {
         throw new ApiError(404, "User not found")
     }
 
+    // aggregation pipeline to fetch tweets along with owner details
     const tweets = await Tweet.aggregate([
         {
+            // stage 1: match only tweets belonging to this user
             $match: {
                 owner: new mongoose.Types.ObjectId(userId)
             }
         },
         {
+            // stage 2: join with users collection to get owner info
             $lookup: {
                 from: "users",
                 localField: "owner",
@@ -64,6 +71,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
             }
         },
         {
+            // stage 3: lookup returns an array, extract first (and only) element
             $addFields: {
                 ownerDetails: {
                     $first: "$ownerDetails"
@@ -71,6 +79,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
             }
         },
         {
+            // stage 4: sort tweets with newest first
             $sort: {
                 createdAt: -1
             }
@@ -83,6 +92,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
 })
 
 const updateTweet = asyncHandler(async (req, res) => {
+    // tweetId of the tweet to update, new content from body
     const { tweetId } = req.params
     const { content } = req.body
 
@@ -94,12 +104,14 @@ const updateTweet = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Content is required")
     }
 
+    // fetch the tweet to check existence and ownership
     const tweet = await Tweet.findById(tweetId)
 
     if (!tweet) {
         throw new ApiError(404, "Tweet not found")
     }
 
+    // only the tweet owner is allowed to update it
     if (tweet.owner.toString() !== req.user?._id.toString()) {
         throw new ApiError(403, "You are not authorized to update this tweet")
     }
@@ -132,12 +144,14 @@ const deleteTweet = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid tweet id")
     }
 
+    // fetch tweet first to check existence and ownership before deleting
     const tweet = await Tweet.findById(tweetId)
 
     if (!tweet) {
         throw new ApiError(404, "Tweet not found")
     }
 
+    // only the tweet owner is allowed to delete it
     if (tweet.owner.toString() !== req.user?._id.toString()) {
         throw new ApiError(403, "You are not authorized to delete this tweet")
     }

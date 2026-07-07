@@ -71,7 +71,36 @@ const getVideoComments = asyncHandler(async (req, res) => {
 })
 
 const addComment = asyncHandler(async (req, res) => {
-    // TODO: add a comment to a video
+    const { videoId } = req.params
+    const { content } = req.body
+
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, "Invalid video id")
+    }
+
+    if (!content?.trim()) {
+        throw new ApiError(400, "Content is required")
+    }
+
+    const video = await Video.findById(videoId)
+
+    if (!video) {
+        throw new ApiError(404, "Video not found")
+    }
+
+    const comment = await Comment.create({
+        content,
+        video: videoId,
+        owner: req.user?._id
+    })
+
+    if (!comment) {
+        throw new ApiError(500, "Failed to add a comment , please try again")
+    }
+
+    return res
+    .status(201)
+    .json(new ApiResponse(201, comment, "Comment added successfully"))
 })
 
 const updateComment = asyncHandler(async (req, res) => {

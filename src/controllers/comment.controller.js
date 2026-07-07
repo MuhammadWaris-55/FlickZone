@@ -164,7 +164,7 @@ const deleteComment = asyncHandler(async (req, res) => {
         throw new ApiError(403, "Only the comment owner can delete this comment")
     }
 
-    commentToDelete = await Comment.findByIdAndDelete(commentId)
+    const commentToDelete = await Comment.findByIdAndDelete(commentId)
 
     return res
         .status(200)

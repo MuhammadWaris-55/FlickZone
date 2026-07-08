@@ -6,6 +6,8 @@ import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 
 const getVideoComments = asyncHandler(async (req, res) => {
+    // videoId comes from the route param, page/limit are optional query params
+    // with sane defaults so the frontend doesn't have to always send them
     const {videoId} = req.params
     const {page = 1, limit = 10} = req.query
 
@@ -13,19 +15,27 @@ const getVideoComments = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid video id")
     }
 
+    // confirm the video actually exists before fetching comments for it
+    // (avoids returning an empty paginated result for a nonexistent video
+    // without telling the client why)
+
     const video = await Video.findById(videoId)
 
     if (!video) {
         throw new ApiError(404, "Video not found")
     }
 
+    // build the aggregation pipeline WITHOUT $skip/$limit -
+    // aggregatePaginate will inject those stages itself based on `options`
     const commentsAggregate = Comment.aggregate([
         {
+            // only fetch comments belonging to this specific video
             $match: {
                 video: new mongoose.Types.ObjectId(videoId)
             }
         },
         {
+            // join in the comment owner's user info from the users collection
             $lookup: {
                 from: "users",
                 localField: "owner",
@@ -33,6 +43,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
                 as: "owner",
                 pipeline: [
                     {
+                        // only pull the fields the frontend needs -
                         $project: {
                             username: 1,
                             fullname: 1,
@@ -44,6 +55,8 @@ const getVideoComments = asyncHandler(async (req, res) => {
             }
         },
         {
+            // $lookup always returns an array, even for a single match -
+            // $first flattens it into a plain object for easier frontend use
             $addFields: {
                 owner: {
                     $first: "$owner"
@@ -51,17 +64,21 @@ const getVideoComments = asyncHandler(async (req, res) => {
             }
         },
         {
+            //newest comments first
             $sort: {
                 createdAt: -1
             }
         }
     ])
 
+    // page/limit arrive as strings from req.query, so convert to numbers
+    // before handing off to the pagination plugin
     const options = {
         page: parseInt(page, 10),
         limit: parseInt(limit, 10)
     }
 
+    // runs the pipeline + applies skip/limit + returns pagination metadata
     const comments = await Comment.aggregatePaginate(commentsAggregate, options)
 
     return res
@@ -82,12 +99,14 @@ const addComment = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Content is required")
     }
 
+    // make sure we're not attaching a comment to a video that doesn't exist
     const video = await Video.findById(videoId)
 
     if (!video) {
         throw new ApiError(404, "Video not found")
     }
 
+    // this is how we know WHO is posting the comment
     const comment = await Comment.create({
         content,
         video: videoId,
@@ -115,12 +134,16 @@ const updateComment = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Content is required")
     }
 
+    // fetch the comment first so we can check both existence AND ownership
     const comment = await Comment.findById(commentId)
 
     if (!comment) {
         throw new ApiError(404, "Comment not found")
     }
 
+    // AUTHORIZATION check - authentication (verifyJWT) only confirms the user
+    // is logged in, this confirms they actually own THIS specific comment.
+    // Without this, any logged-in user could edit someone else's comment.
     if (comment.owner.toString() !== req.user?._id.toString()) {
         throw new ApiError(403, "Only the comment owner can edit this comment")
     }
@@ -154,6 +177,8 @@ const deleteComment = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid comment id")
     }
 
+    // same pattern as updateComment - fetch first to verify existence + ownership
+    // before allowing the delete
     const comment = await Comment.findById(commentId)
 
     if (!comment) {

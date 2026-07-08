@@ -166,6 +166,10 @@ const deleteComment = asyncHandler(async (req, res) => {
 
     const commentToDelete = await Comment.findByIdAndDelete(commentId)
 
+    if (!commentToDelete) {
+        throw new ApiError(500, "Failed to delete comment, please try again")
+    }
+
     return res
         .status(200)
         .json(new ApiResponse(200, commentToDelete, "Comment deleted successfully"))

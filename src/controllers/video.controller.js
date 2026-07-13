@@ -240,10 +240,14 @@ const getVideoById = asyncHandler(async (req, res) => {
                     },
                     {
                         $addFields: {
-                            subscribersCount: { $size: "$subscribers" },
+                            subscribersCount: {
+                                $size: "$subscribers" 
+                            },
                             isSubscribed: {
                                 $cond: {
-                                    if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+                                    if: { 
+                                        $in: [req.user?._id, "$subscribers.subscriber"] 
+                                    },
                                     then: true,
                                     else: false
                                 }
@@ -264,11 +268,17 @@ const getVideoById = asyncHandler(async (req, res) => {
         },
         {
             $addFields: {
-                owner: { $first: "$owner" },
-                likesCount: { $size: "$likes" },
+                owner: { 
+                    $first: "$owner" 
+                },
+                likesCount: { 
+                    $size: "$likes" 
+                },
                 isLiked: {
                     $cond: {
-                        if: { $in: [req.user?._id, "$likes.likedBy"] },
+                        if: { 
+                            $in: [req.user?._id, "$likes.likedBy"] 
+                        },
                         then: true,
                         else: false
                     }

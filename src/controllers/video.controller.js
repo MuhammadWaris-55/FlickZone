@@ -5,6 +5,7 @@ import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
+import { deleteFromCloudinary } from "../utils/cloudinary.js"
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
@@ -319,7 +320,59 @@ const getVideoById = asyncHandler(async (req, res) => {
 
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
-    //TODO: update video details like title, description, thumbnail
+    const { title, description } = req.body
+
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, "Invalid videoId")
+    }
+
+    if (!title?.trim() && !description?.trim() && !req.file) {
+        throw new ApiError(400, "At least one field is required to update")
+    }
+
+    const video = await Video.findById(videoId)
+
+    if (!video) {
+        throw new ApiError(404, "Video not found")
+    }
+
+    // only the owner can update their own video
+    if (video.owner.toString() !== req.user?._id.toString()) {
+        throw new ApiError(403, "You are not authorized to update this video")
+    }
+
+    const updateData = {}
+    if (title?.trim()) updateData.title = title
+    if (description?.trim()) updateData.description = description
+
+    // thumbnail is optional - only touch cloudinary if a new one was sent
+     const thumbnailLocalPath = req.file?.path
+    if (thumbnailLocalPath) {
+        const thumbnail = await uploadOnCloudinary(thumbnailLocalPath)
+
+        if (!thumbnail?.url) {
+            throw new ApiError(400, "Failed to upload new thumbnail")
+        }
+
+        // delete the old thumbnail from cloudinary so it doesn't sit there unused
+        await deleteFromCloudinary(video.thumbnail)
+
+        updateData.thumbnail = thumbnail.url
+    }
+
+    const updatedVideo = await Video.findByIdAndUpdate(
+    videoId,
+    { $set: updateData },
+    { new: true }
+    )
+
+    if (!updatedVideo) {
+        throw new ApiError(500, "Something went wrong while updating the video")
+    }
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, updateVideo, "Video updated successfully"))
 
 })
 

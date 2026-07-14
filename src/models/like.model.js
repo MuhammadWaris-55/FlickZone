@@ -17,6 +17,11 @@ const likeSchema = new Schema(
         tweet: {
             type: Schema.Types.ObjectId,
             ref: "Tweet"
+        },
+        type: {
+            type: String,
+            enum: ["like", "dislike"],
+            default: "like"
         }
     },
     {

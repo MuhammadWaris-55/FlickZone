@@ -57,6 +57,55 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 
 })
 
+const toggleVideoDislike = asyncHandler(async (req, res) => {
+    const {videoId} = req.params
+
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, "Invalid video id")
+    }
+
+    const video = await Video.findById(videoId)
+
+    if (!video) {
+        throw new ApiError(404, "Video not found")
+    }
+
+    const existingReaction = await Like.findOne({
+        video: videoId,
+        likedBy: req.user?._id
+    })
+
+    // no reaction yet -> create a dislike
+    if (!existingReaction) {
+        await Like.create({
+            video: videoId,
+            likedBy: req.user?._id,
+            type: "dislike"
+        })
+
+        return res
+            .status(200)
+            .json(new ApiResponse(200, {isDisliked: true}, "Video disliked successfully"))
+    }
+
+    // already disliked -> remove dislike (toggle off)
+    if (existingReaction.type === "dislike") {
+        await Like.findByIdAndDelete(existingReaction._id)
+
+        return res
+            .status(200)
+            .json(new ApiResponse(200, {isDisliked: false}, "Dislike removed from video"))
+    }
+
+    // was liked -> switch to dislike
+    existingReaction.type = "dislike"
+    await existingReaction.save()
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {isDisliked: true}, "Video disliked successfully"))
+})
+
 const toggleCommentLike = asyncHandler(async (req, res) => {
     const { commentId } = req.params
     //TODO: toggle like on comment
@@ -77,5 +126,6 @@ export {
     toggleCommentLike,
     toggleTweetLike,
     toggleVideoLike,
+    toggleVideoDislike,
     getLikedVideos
 }

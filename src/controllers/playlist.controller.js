@@ -200,8 +200,6 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
 const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
     const { playlistId, videoId } = req.params
 
-    const { playlistId, videoId } = req.params
-
     // validate both ids before touching the DB
     if (!isValidObjectId(playlistId) || !isValidObjectId(videoId)) {
         throw new ApiError(400, "Invalid playlist id or video id")

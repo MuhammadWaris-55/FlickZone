@@ -186,6 +186,8 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 const getLikedVideos = asyncHandler(async (req, res) => {
     const likedVideos = await Like.aggregate([
         {
+            // only this user's likes, and only reactions on videos
+            // (Like model is shared across video/comment/tweet, so we filter it down)
             $match: {
                 likedBy: new mongoose.Types.ObjectId(req.user?._id),
                 type: "like",
@@ -193,6 +195,7 @@ const getLikedVideos = asyncHandler(async (req, res) => {
             }
         },
         {
+            // join the actual video document for each like
             $lookup: {
                 from: "videos",
                 localField: "video",
@@ -200,6 +203,7 @@ const getLikedVideos = asyncHandler(async (req, res) => {
                 as: "video",
                 pipeline: [
                     {
+                        // get the video's owner details too
                         $lookup: {
                             from: "users",
                             localField: "owner",
@@ -208,9 +212,11 @@ const getLikedVideos = asyncHandler(async (req, res) => {
                         }
                     },
                     {
+                        // owner lookup returns an array, flatten it to a single object
                         $unwind: "$owner"
                     },
                     {
+                        // only send the fields the frontend actually needs
                         $project: {
                             videoFile: 1,
                             thumbnail: 1,
@@ -231,14 +237,17 @@ const getLikedVideos = asyncHandler(async (req, res) => {
             }
         },
         {
+            // $lookup always returns an array, flatten it since it's one video per like
             $unwind: "$video"
         },
         {
+            // most recently liked video first
             $sort: {
                 createdAt: -1
             }
         },
         {
+            // drop the Like document's own fields, keep only the video
             $project: {
                 _id: 0,
                 video: 1

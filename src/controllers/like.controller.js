@@ -25,36 +25,35 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
         likedBy: req.user?._id
     })
 
-    // no reaction yet -> create a dislike
+    // no reaction yet -> create a like
     if (!existingReaction) {
         await Like.create({
             video: videoId,
             likedBy: req.user?._id,
-            type: "dislike"
+            type: "like"
         })
 
         return res
             .status(200)
-            .json(new ApiResponse(200, { isDisliked: true }, "Video disliked successfully"))
+            .json(new ApiResponse(200, { isLiked: true }, "Video liked successfully"))
     }
 
-    // already disliked -> remove dislike (toggle off)
-    if (existingReaction.type === "dislike") {
+    // already liked -> remove like (toggle off)
+    if (existingReaction.type === "like") {
         await Like.findByIdAndDelete(existingReaction._id)
 
         return res
             .status(200)
-            .json(new ApiResponse(200, { isDisliked: false }, "Dislike removed from video"))
+            .json(new ApiResponse(200, { isLiked: false }, "Like removed from video"))
     }
 
-    // was liked -> switch to dislike
-    existingReaction.type = "dislike"
+    // was disliked -> switch to like
+    existingReaction.type = "like"
     await existingReaction.save()
 
     return res
         .status(200)
-        .json(new ApiResponse(200, { isDisliked: true }, "Video disliked successfully"))
-
+        .json(new ApiResponse(200, { isLiked: true }, "Video liked successfully"))
 })
 
 const toggleVideoDislike = asyncHandler(async (req, res) => {

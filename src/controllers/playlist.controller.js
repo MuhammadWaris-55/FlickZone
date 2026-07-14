@@ -200,7 +200,7 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
 const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
     const { playlistId, videoId } = req.params
 
-     const { playlistId, videoId } = req.params
+    const { playlistId, videoId } = req.params
 
     // validate both ids before touching the DB
     if (!isValidObjectId(playlistId) || !isValidObjectId(videoId)) {
@@ -243,13 +243,79 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
 
 const deletePlaylist = asyncHandler(async (req, res) => {
     const { playlistId } = req.params
-    // TODO: delete playlist
+
+    // validate the id before touching the DB
+    if (!isValidObjectId(playlistId)) {
+        throw new ApiError(400, "Invalid playlist id")
+    }
+
+    const playlist = await Playlist.findById(playlistId)
+
+    if (!playlist) {
+        throw new ApiError(404, "Playlist not found")
+    }
+
+    // only the owner is allowed to delete their playlist
+    if (playlist.owner.toString() !== req.user?._id.toString()) {
+        throw new ApiError(403, "You are not authorized to delete this playlist")
+    }
+
+    const deletedPlaylist = await Playlist.findByIdAndDelete(playlistId)
+
+    if (!deletedPlaylist) {
+        throw new ApiError(500, "Something went wrong while deleting the playlist")
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "Playlist deleted successfully"))
 })
 
 const updatePlaylist = asyncHandler(async (req, res) => {
     const { playlistId } = req.params
     const { name, description } = req.body
-    //TODO: update playlist
+
+    // validate the id before touching the DB
+    if (!isValidObjectId(playlistId)) {
+        throw new ApiError(400, "Invalid playlist id")
+    }
+
+    // both fields required, same rule as createPlaylist
+    if (!name?.trim() || !description?.trim()) {
+        throw new ApiError(400, "Name and description are both required")
+    }
+
+    const playlist = await Playlist.findById(playlistId)
+
+    if (!playlist) {
+        throw new ApiError(404, "Playlist not found")
+    }
+
+    // only the owner is allowed to update their playlist
+    if (playlist.owner.toString() !== req.user?._id.toString()) {
+        throw new ApiError(403, "You are not authorized to update this playlist")
+    }
+
+    const updatedPlaylist = await Playlist.findByIdAndUpdate(
+        playlistId,
+        {
+            $set: {
+                name,
+                description
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+    if (!updatedPlaylist) {
+        throw new ApiError(500, "Something went wrong while updating the playlist")
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, updatedPlaylist, "Playlist updated successfully"))
 })
 
 export {

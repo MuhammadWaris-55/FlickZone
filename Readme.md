@@ -25,10 +25,7 @@ The project was built as a deep-dive into backend system design, with an emphasi
 - **Framework:** Express.js
 - **Database:** MongoDB with Mongoose ODM
 - **Media Storage:** Cloudinary
-- **File Uploads:** Multer
 - **Authentication:** JSON Web Tokens (JWT) — Access & Refresh Token flow
-- **Pagination:** mongoose-aggregate-paginate-v2
-- **API Testing:** Postman
 
 ---
 
@@ -133,37 +130,6 @@ All routes are prefixed with `/api/v1`. Endpoints marked **Protected** require a
 | GET | `/tweets/user/:userId` | Get all tweets by a specific user | Protected |
 | PATCH | `/tweets/:tweetId` | Update a tweet | Protected |
 | DELETE | `/tweets/:tweetId` | Delete a tweet | Protected |
-
----
-
-## Engineering Highlights
-
-A few notable problems solved during development that shaped the robustness of this backend:
-
-- **Orphaned process debugging:** Diagnosed and resolved a mysterious 404 caused by a lingering Node process occupying a port, identified using `netstat`.
-- **ESM/dotenv hoisting issue:** Resolved an environment variable loading bug caused by ES Module import hoisting by isolating configuration into a dedicated `config.js`.
-- **Mongoose pre-save hook bug:** Fixed a missing `await` in a pre-save middleware hook that was silently causing incorrect password hash behavior.
-
----
-
-## API Testing
-
-All endpoints have been thoroughly tested using **Postman**, covering:
-- Successful and failure-path responses
-- Auth-protected route behavior
-- File upload flows
-- Pagination and aggregation query correctness
-
----
-
-## Project Status
-
-FlickZone's backend is actively being developed and refined. Current focus areas include:
-- Finalizing subscription and like/dislike systems
-- Expanding test coverage
-- Preparing the API for frontend integration
-
-Frontend implementation and documentation will follow in a future update.
 
 ---
 

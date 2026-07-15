@@ -97,6 +97,9 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
                     },
                     {
                         $addFields: {
+                            // NOTE: this is NOT the subscriber count of the channel
+                            // you are viewing. This checks whether the CHANNEL OWNER
+                            // has subscribed back to THIS subscriber (mutual-follow flag)
                             subscribedToSubscriber: {
                                 $cond: {
                                     if: {
@@ -109,7 +112,10 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
                                     else: false
                                 }
                             },
-                            subscribersCount: {
+                            // how many subscribers does THIS subscriber have
+                            // on their own channel (renamed to avoid confusion
+                            // with the main channel's subscriber count below)
+                            subscriberOwnFollowerCount: {
                                 $size: "$subscribedToSubscriber"
                             }
                         }
@@ -121,7 +127,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
                             fullName: 1,
                             avatar: 1,
                             subscribedToSubscriber: 1,
-                            subscribersCount: 1
+                            subscriberOwnFollowerCount: 1
                         }
                     }
                 ]
@@ -141,9 +147,13 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
         }
     ])
 
+    // this is the actual "how many people subscribe to THIS channel" number
+    // simplest way to get it: the length of the array we just built
+    const totalSubscribers = subscribers.length
+
     return res
         .status(200)
-        .json(new ApiResponse(200, subscribers, "Subscribers fetched successfully"))
+        .json(new ApiResponse(200,{ totalSubscribers, subscribers },"Subscribers fetched successfully"))
 })
 
 // controller to return channel list to which user has subscribed

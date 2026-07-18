@@ -131,3 +131,20 @@
     @apply font-sans;
   }
 }
+
+@layer utilities {
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--color-accent-deep) 25%,
+      var(--accent-mid, #1a4468) 37%,
+      var(--color-accent-deep) 63%
+    );
+    background-size: 400% 100%;
+    animation: shimmer 1.6s ease-in-out infinite;
+  }
+  @keyframes shimmer {
+    0% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+}

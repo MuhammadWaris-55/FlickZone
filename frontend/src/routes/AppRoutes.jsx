@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
+import MainLayout from "@/layouts/MainLayout";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 
-// Placeholder pages for now — replace with real ones as we build them
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
@@ -11,21 +11,26 @@ import Dashboard from "@/pages/Dashboard";
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* Public routes — anyone can view */}
-      <Route path="/" element={<Home />} />
+      {/* Every route nested inside here renders through MainLayout's <Outlet /> */}
+      <Route element={<MainLayout />}>
+        {/* Public routes */}
+        <Route path="/" element={<Home />} />
+        <Route path="/watch/:videoId" element={<Watch />} />
+
+        {/* Protected routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+      </Route>
+
+      {/* Login/Register render WITHOUT the sidebar/nav — standalone pages */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/watch/:videoId" element={<Watch />} />
-
-      {/* Protected routes — must be logged in */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        }
-      />
     </Routes>
   );
 }

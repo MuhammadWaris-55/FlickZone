@@ -1,13 +1,14 @@
 import { Routes, Route } from "react-router-dom";
 import MainLayout from "@/layouts/MainLayout";
+import AuthLayout from "@/layouts/AuthLayout";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Watch from "@/pages/Watch";
+import Channel from "@/pages/Channel";
 import Dashboard from "@/pages/Dashboard";
-import AuthLayout from "@/layouts/AuthLayout";
 
 export default function AppRoutes() {
   return (
@@ -17,6 +18,7 @@ export default function AppRoutes() {
         {/* Public routes */}
         <Route path="/" element={<Home />} />
         <Route path="/watch/:videoId" element={<Watch />} />
+        <Route path="/channel/:username" element={<Channel />} />
 
         {/* Protected routes */}
         <Route
@@ -31,9 +33,9 @@ export default function AppRoutes() {
 
       {/* Login/Register render WITHOUT the sidebar/nav — standalone pages */}
       <Route element={<AuthLayout />}>
-  <Route path="/login" element={<Login />} />
-  <Route path="/register" element={<Register />} />
-</Route>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Route>
     </Routes>
   );
 }

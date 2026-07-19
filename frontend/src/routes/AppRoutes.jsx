@@ -7,6 +7,7 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Watch from "@/pages/Watch";
 import Dashboard from "@/pages/Dashboard";
+import AuthLayout from "@/layouts/AuthLayout";
 
 export default function AppRoutes() {
   return (
@@ -29,8 +30,10 @@ export default function AppRoutes() {
       </Route>
 
       {/* Login/Register render WITHOUT the sidebar/nav — standalone pages */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route element={<AuthLayout />}>
+  <Route path="/login" element={<Login />} />
+  <Route path="/register" element={<Register />} />
+</Route>
     </Routes>
   );
 }

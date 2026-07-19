@@ -1,42 +1,46 @@
 import { useParams } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useVideo } from "@/hooks/useVideo";
-import LikeButton from "@/components/LikeButton";
-import SubscribeButton from "@/components/SubscribeButton";
+import CinematicPlayer from "@/components/CinematicPlayer";
+import VideoInfoPanel from "@/components/VideoInfoPanel";
 import CommentSection from "@/components/CommentSection";
 
 export default function Watch() {
   const { videoId } = useParams();
   const { video, loading } = useVideo(videoId);
 
-  if (loading) return <p className="p-6">Loading video...</p>;
-  if (!video) return <p className="p-6">Video not found.</p>;
+  if (loading) {
+    return (
+      <div className="p-6 max-w-4xl mx-auto">
+        <div className="aspect-video rounded-2xl shimmer" />
+        <div className="mt-5 space-y-3">
+          <div className="h-6 w-2/3 rounded shimmer" />
+          <div className="h-4 w-1/3 rounded shimmer" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!video) {
+    return (
+      <div className="p-6 max-w-4xl mx-auto text-center py-20">
+        <p className="text-muted-foreground">Video not found.</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6 max-w-4xl">
-      <video
-        src={video.videoFile}
-        controls
-        className="w-full rounded-xl bg-black aspect-video"
-      />
+    <div className="p-6 max-w-4xl mx-auto">
+      <CinematicPlayer video={video} />
+      <VideoInfoPanel video={video} />
 
-      <h1 className="font-heading text-xl font-bold mt-4">{video.title}</h1>
-
-      <div className="flex items-center justify-between mt-3">
-        <div className="flex items-center gap-3">
-          <img src={video.owner?.avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
-          <div>
-            <p className="font-medium text-sm">{video.owner?.username}</p>
-            <p className="text-xs text-muted-foreground">{video.owner?.subscribersCount ?? 0} subscribers</p>
-          </div>
-          <SubscribeButton channelId={video.owner?._id} initialSubscribed={video.owner?.isSubscribed} />
-        </div>
-
-        <LikeButton videoId={video._id} initialLiked={video.isLiked} initialCount={video.likesCount} />
-      </div>
-
-      <p className="text-sm text-muted-foreground mt-4">{video.description}</p>
-
-      <CommentSection videoId={video._id} />
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+      >
+        <CommentSection videoId={video._id} />
+      </motion.div>
     </div>
   );
 }

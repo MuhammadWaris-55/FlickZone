@@ -11,11 +11,16 @@ import {verifyJWT} from "../middlewares/auth.middleware.js"
 import {upload} from "../middlewares/multer.middleware.js"
 
 const router = Router();
-router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
+
+// Public routes — no auth required, guests can browse and watch
+router.route("/").get(getAllVideos);
+router.route("/:videoId").get(getVideoById);
+
+// Everything below this line requires authentication
+router.use(verifyJWT);
 
 router
     .route("/")
-    .get(getAllVideos)
     .post(
         upload.fields([
             {
@@ -26,14 +31,12 @@ router
                 name: "thumbnail",
                 maxCount: 1,
             },
-            
         ]),
         publishAVideo
     );
 
 router
     .route("/:videoId")
-    .get(getVideoById)
     .delete(deleteVideo)
     .patch(upload.single("thumbnail"), updateVideo);
 

@@ -9,6 +9,7 @@ import Register from "@/pages/Register";
 import Watch from "@/pages/Watch";
 import Channel from "@/pages/Channel";
 import Dashboard from "@/pages/Dashboard";
+import Upload from "@/pages/Upload";
 
 export default function AppRoutes() {
   return (
@@ -30,6 +31,14 @@ export default function AppRoutes() {
           }
         />
       </Route>
+      <Route
+        path="/upload"
+        element={
+          <ProtectedRoute>
+            <Upload />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Login/Register render WITHOUT the sidebar/nav — standalone pages */}
       <Route element={<AuthLayout />}>

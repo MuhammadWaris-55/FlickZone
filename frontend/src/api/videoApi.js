@@ -9,3 +9,14 @@ export const getVideoById = async (videoId) => {
   const res = await axiosInstance.get(`/videos/${videoId}`);
   return res.data.data;
 };
+
+export const publishVideo = async (formData, onUploadProgress) => {
+  const res = await axiosInstance.post("/videos", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+    onUploadProgress: (event) => {
+      const percent = Math.round((event.loaded * 100) / event.total);
+      onUploadProgress?.(percent);
+    },
+  });
+  return res.data.data;
+};

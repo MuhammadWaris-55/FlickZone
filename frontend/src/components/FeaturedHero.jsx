@@ -11,15 +11,17 @@ export default function FeaturedHero({ video }) {
   });
 
   // Parallax layers move at different speeds as you scroll past the hero
-  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
-  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "60%"]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
-  const glowScale = useTransform(scrollYProgress, [0, 1], [1, 1.4]);
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
+  const glowScale = useTransform(scrollYProgress, [0, 1], [1, 1.3]);
 
   if (!video) return null;
 
   return (
-    <div ref={ref} className="relative h-[70vh] min-h-[420px] overflow-hidden rounded-2xl mb-10">
+    <div
+      ref={ref}
+      className="relative h-[70vh] min-h-[420px] overflow-hidden rounded-2xl mb-10"
+    >
       {/* Background layer — moves slowest */}
       <motion.div style={{ y: bgY }} className="absolute inset-0 scale-110">
         <img
@@ -39,7 +41,7 @@ export default function FeaturedHero({ video }) {
 
       {/* Content layer — moves fastest, fades on scroll */}
       <motion.div
-        style={{ y: contentY, opacity: contentOpacity }}
+        style={{ opacity: contentOpacity }}
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: "easeOut" }}

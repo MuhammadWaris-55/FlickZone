@@ -9,10 +9,20 @@ export default function Upload() {
   const [form, setForm] = useState({ title: "", description: "" });
   const [videoFile, setVideoFile] = useState(null);
   const [thumbnail, setThumbnail] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!videoFile || !thumbnail || !form.title) return;
+    const errors = {};
+    if (!form.title.trim()) errors.title = true;
+    if (!videoFile) errors.videoFile = true;
+    if (!thumbnail) errors.thumbnail = true;
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+    setFieldErrors({});
     upload({ ...form, videoFile, thumbnail });
   };
 
@@ -36,27 +46,70 @@ export default function Upload() {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid md:grid-cols-2 gap-4">
-              <DropZone
-                label="Video file"
-                accept="video/*"
-                onFileSelect={setVideoFile}
-                previewType="video"
-              />
-              <DropZone
-                label="Thumbnail"
-                accept="image/*"
-                onFileSelect={setThumbnail}
-                previewType="image"
-              />
+              <div>
+                <div
+                  className={
+                    fieldErrors.videoFile
+                      ? "ring-2 ring-destructive rounded-xl"
+                      : ""
+                  }
+                >
+                  <DropZone
+                    label="Video file"
+                    accept="video/*"
+                    onFileSelect={(f) => {
+                      setVideoFile(f);
+                      setFieldErrors((prev) => ({ ...prev, videoFile: false }));
+                    }}
+                    previewType="video"
+                  />
+                </div>
+                {fieldErrors.videoFile && (
+                  <p className="text-destructive text-xs mt-1.5">Video file is required.</p>
+                )}
+              </div>
+
+              <div>
+                <div
+                  className={
+                    fieldErrors.thumbnail
+                      ? "ring-2 ring-destructive rounded-xl"
+                      : ""
+                  }
+                >
+                  <DropZone
+                    label="Thumbnail"
+                    accept="image/*"
+                    onFileSelect={(f) => {
+                      setThumbnail(f);
+                      setFieldErrors((prev) => ({ ...prev, thumbnail: false }));
+                    }}
+                    previewType="image"
+                  />
+                </div>
+                {fieldErrors.thumbnail && (
+                  <p className="text-destructive text-xs mt-1.5">Thumbnail is required.</p>
+                )}
+              </div>
             </div>
 
-            <input
-              type="text"
-              placeholder="Title"
-              value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="w-full bg-background/60 border border-border rounded-lg px-4 py-3 text-sm outline-none focus:border-accent transition-colors"
-            />
+            <div>
+              <input
+                type="text"
+                placeholder="Title"
+                value={form.title}
+                onChange={(e) => {
+                  setForm({ ...form, title: e.target.value });
+                  setFieldErrors((prev) => ({ ...prev, title: false }));
+                }}
+                className={`w-full bg-background/60 border rounded-lg px-4 py-3 text-sm outline-none focus:border-accent transition-colors ${
+                  fieldErrors.title ? "border-destructive" : "border-border"
+                }`}
+              />
+              {fieldErrors.title && (
+                <p className="text-destructive text-xs mt-1.5">Title is required.</p>
+              )}
+            </div>
 
             <textarea
               placeholder="Description"

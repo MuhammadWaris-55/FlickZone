@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useChannel } from "@/hooks/useChannel";
+import { getVideosByOwner } from "@/api/videoApi";
 import ChannelBanner from "@/components/ChannelBanner";
 import ChannelTabs from "@/components/ChannelTabs";
 import VideoCard from "@/components/VideoCard";
@@ -11,6 +12,19 @@ export default function Channel() {
   const { username } = useParams();
   const { channel, loading } = useChannel(username);
   const [activeTab, setActiveTab] = useState("Videos");
+
+  const [channelVideos, setChannelVideos] = useState([]);
+  const [videosLoading, setVideosLoading] = useState(true);
+
+  useEffect(() => {
+    if (channel?._id) {
+      setVideosLoading(true);
+      getVideosByOwner(channel._id)
+        .then((data) => setChannelVideos(data.docs || data || []))
+        .catch(() => setChannelVideos([]))
+        .finally(() => setVideosLoading(false));
+    }
+  }, [channel?._id]);
 
   if (loading) {
     return (
@@ -40,13 +54,19 @@ export default function Channel() {
           >
             {activeTab === "Videos" && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {channel.videos?.length
-                  ? channel.videos.map((video, i) => (
-                      <VideoCard key={video._id} video={video} index={i} />
-                    ))
-                  : Array.from({ length: 3 }).map((_, i) => (
-                      <VideoCardSkeleton key={i} />
-                    ))}
+                {videosLoading ? (
+                  Array.from({ length: 3 }).map((_, i) => (
+                    <VideoCardSkeleton key={i} />
+                  ))
+                ) : channelVideos.length ? (
+                  channelVideos.map((video, i) => (
+                    <VideoCard key={video._id} video={video} index={i} />
+                  ))
+                ) : (
+                  <p className="text-muted-foreground text-sm col-span-full">
+                    No videos uploaded yet.
+                  </p>
+                )}
               </div>
             )}
 

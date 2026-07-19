@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
 import { Outlet } from "react-router-dom";
 import Navigation from "@/components/Navigation";
+import Navbar from "@/components/Navbar";
 
 export default function MainLayout() {
   return (
     <div className="flex min-h-screen bg-background relative">
-      {/* Ambient background layer — contains its own overflow, doesn't affect layout */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <motion.div
           animate={{ x: [0, 60, 0], y: [0, 40, 0] }}
@@ -20,9 +20,13 @@ export default function MainLayout() {
       </div>
 
       <Navigation />
-      <main className="flex-1 pb-16 md:pb-0 relative z-10">
-        <Outlet />
-      </main>
+
+      <div className="flex-1 flex flex-col relative z-10 min-w-0">
+        <Navbar />
+        <main className="flex-1 pb-16 md:pb-0">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

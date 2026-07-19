@@ -20,3 +20,8 @@ export const publishVideo = async (formData, onUploadProgress) => {
   });
   return res.data.data;
 };
+
+export const getVideosByOwner = async (ownerId) => {
+  const res = await axiosInstance.get("/videos", { params: { userId: ownerId } });
+  return res.data.data;
+};

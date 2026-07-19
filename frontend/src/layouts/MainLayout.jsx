@@ -1,11 +1,11 @@
-import Navigation from "@/components/Navigation";
-import { Outlet } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Outlet } from "react-router-dom";
+import Navigation from "@/components/Navigation";
 
 export default function MainLayout() {
   return (
-    <div className="flex min-h-screen bg-background relative overflow-hidden">
-      {/* Ambient background layer */}
+    <div className="flex min-h-screen bg-background relative">
+      {/* Ambient background layer — contains its own overflow, doesn't affect layout */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <motion.div
           animate={{ x: [0, 60, 0], y: [0, 40, 0] }}

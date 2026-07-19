@@ -10,8 +10,14 @@ export default function VideoCard({ video, index = 0 }) {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [8, -8]), { stiffness: 200, damping: 20 });
-  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-8, 8]), { stiffness: 200, damping: 20 });
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [8, -8]), {
+    stiffness: 200,
+    damping: 20,
+  });
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-8, 8]), {
+    stiffness: 200,
+    damping: 20,
+  });
   const glowX = useTransform(mouseX, [-0.5, 0.5], ["0%", "100%"]);
   const glowY = useTransform(mouseY, [-0.5, 0.5], ["0%", "100%"]);
 
@@ -50,7 +56,10 @@ export default function VideoCard({ video, index = 0 }) {
             className="absolute inset-0 opacity-0 group-hover:opacity-15 transition-opacity duration-300 pointer-events-none z-10"
           />
 
-          <div className="relative aspect-video overflow-hidden bg-accent-deep" style={{ transform: "translateZ(20px)" }}>
+          <div
+            className="relative aspect-video overflow-hidden bg-accent-deep"
+            style={{ transform: "translateZ(20px)" }}
+          >
             <img
               src={video.thumbnail}
               alt={video.title}
@@ -63,21 +72,34 @@ export default function VideoCard({ video, index = 0 }) {
             )}
           </div>
 
-          <div className="p-3 flex gap-3 relative z-10" style={{ transform: "translateZ(10px)" }}>
+          <div
+            className="p-3 flex gap-3 relative z-10"
+            style={{ transform: "translateZ(10px)" }}
+          >
             {video.owner?.avatar && (
-              <img
-                src={video.owner.avatar}
-                alt={video.owner.username}
-                className="w-9 h-9 rounded-full object-cover shrink-0 ring-1 ring-border"
-              />
+              <Link
+                to={`/channel/${video.owner.username}`}
+                onClick={(e) => e.stopPropagation()}
+                className="shrink-0"
+              >
+                <img
+                  src={video.owner.avatar}
+                  alt={video.owner.username}
+                  className="w-9 h-9 rounded-full object-cover ring-1 ring-border hover:ring-accent transition-colors"
+                />
+              </Link>
             )}
             <div className="min-w-0">
               <h3 className="font-body font-medium text-sm line-clamp-2 leading-snug">
                 {video.title}
               </h3>
-              <p className="text-xs text-muted-foreground mt-1 truncate">
+              <Link
+                to={`/channel/${video.owner?.username}`}
+                onClick={(e) => e.stopPropagation()}
+                className="text-xs text-muted-foreground mt-1 truncate hover:text-accent transition-colors block w-fit"
+              >
                 {video.owner?.username}
-              </p>
+              </Link>
               <p className="text-xs text-muted-foreground">
                 {formatViews(video.views)} · {timeAgo(video.createdAt)}
               </p>

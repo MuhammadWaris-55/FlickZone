@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import LikeButton from "@/components/LikeButton";
 import SubscribeButton from "@/components/SubscribeButton";
 
@@ -10,18 +11,27 @@ export default function VideoInfoPanel({ video }) {
       transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
       className="relative bg-card/40 backdrop-blur-xl border border-border rounded-2xl p-5 mt-5"
     >
-      <h1 className="font-heading text-xl md:text-2xl font-bold">{video.title}</h1>
+      <h1 className="font-heading text-xl md:text-2xl font-bold">
+        {video.title}
+      </h1>
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4">
         <div className="flex items-center gap-3">
-          <motion.img
-            whileHover={{ scale: 1.08 }}
-            src={video.owner?.avatar}
-            alt=""
-            className="w-11 h-11 rounded-full object-cover ring-2 ring-accent/30"
-          />
+          <Link to={`/channel/${video.owner?.username}`}>
+            <motion.img
+              whileHover={{ scale: 1.08 }}
+              src={video.owner?.avatar}
+              alt=""
+              className="w-11 h-11 rounded-full object-cover ring-2 ring-accent/30"
+            />
+          </Link>
           <div>
-            <p className="font-medium text-sm">{video.owner?.username}</p>
+            <Link
+              to={`/channel/${video.owner?.username}`}
+              className="font-medium text-sm hover:text-accent transition-colors"
+            >
+              {video.owner?.username}
+            </Link>
             <p className="text-xs text-muted-foreground">
               {video.owner?.subscribersCount ?? 0} subscribers
             </p>

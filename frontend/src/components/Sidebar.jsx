@@ -4,10 +4,12 @@ import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import Logo from "@/components/Logo";
 import { sidebarNavItems } from "@/utils/navConfig";
 import { useSidebar } from "@/hooks/useSidebar";
+import { LogOut } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Sidebar() {
   const { isOpen, toggle } = useSidebar();
-
+const { logout, isAuthenticated } = useAuth();
   return (
     <motion.aside
       animate={{ width: isOpen ? 240 : 76 }}
@@ -44,6 +46,16 @@ export default function Sidebar() {
           </NavLink>
         ))}
       </nav>
+
+      {isAuthenticated && (
+  <button
+    onClick={logout}
+    className="flex items-center gap-3 px-3 py-2.5 mx-2 rounded-lg text-destructive hover:bg-destructive/10 transition-colors"
+  >
+    <LogOut size={20} className="shrink-0" />
+    {isOpen && <span className="text-sm font-body whitespace-nowrap">Logout</span>}
+  </button>
+)}
 
       <button
         onClick={toggle}

@@ -10,6 +10,11 @@ import Watch from "@/pages/Watch";
 import Channel from "@/pages/Channel";
 import Dashboard from "@/pages/Dashboard";
 import Upload from "@/pages/Upload";
+import LikedVideos from "@/pages/LikedVideos";
+import History from "@/pages/History";
+import MyContent from "@/pages/MyContent";
+import Collections from "@/pages/Collections";
+import Subscribers from "@/pages/Subscribers";
 
 export default function AppRoutes() {
   return (
@@ -36,6 +41,47 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <Upload />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/liked"
+        element={
+          <ProtectedRoute>
+            <LikedVideos />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/history"
+        element={
+          <ProtectedRoute>
+            <History />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/my-content"
+        element={
+          <ProtectedRoute>
+            <MyContent />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/collections"
+        element={
+          <ProtectedRoute>
+            <Collections />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/subscribers"
+        element={
+          <ProtectedRoute>
+            <Subscribers />
           </ProtectedRoute>
         }
       />

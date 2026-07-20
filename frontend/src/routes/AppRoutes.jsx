@@ -19,74 +19,23 @@ import Subscribers from "@/pages/Subscribers";
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* Every route nested inside here renders through MainLayout's <Outlet /> */}
       <Route element={<MainLayout />}>
-        {/* Public routes */}
+        {/* Public */}
         <Route path="/" element={<Home />} />
         <Route path="/watch/:videoId" element={<Watch />} />
         <Route path="/channel/:username" element={<Channel />} />
 
-        {/* Protected routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+        {/* Protected — all nested here too, so they still get sidebar + navbar */}
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/upload" element={<ProtectedRoute><Upload /></ProtectedRoute>} />
+        <Route path="/liked" element={<ProtectedRoute><LikedVideos /></ProtectedRoute>} />
+        <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
+        <Route path="/my-content" element={<ProtectedRoute><MyContent /></ProtectedRoute>} />
+        <Route path="/collections" element={<ProtectedRoute><Collections /></ProtectedRoute>} />
+        <Route path="/subscribers" element={<ProtectedRoute><Subscribers /></ProtectedRoute>} />
       </Route>
-      <Route
-        path="/upload"
-        element={
-          <ProtectedRoute>
-            <Upload />
-          </ProtectedRoute>
-        }
-      />
 
-      <Route
-        path="/liked"
-        element={
-          <ProtectedRoute>
-            <LikedVideos />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/history"
-        element={
-          <ProtectedRoute>
-            <History />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/my-content"
-        element={
-          <ProtectedRoute>
-            <MyContent />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/collections"
-        element={
-          <ProtectedRoute>
-            <Collections />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/subscribers"
-        element={
-          <ProtectedRoute>
-            <Subscribers />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Login/Register render WITHOUT the sidebar/nav — standalone pages */}
+      {/* Auth pages — no sidebar/navbar */}
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

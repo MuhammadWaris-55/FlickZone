@@ -12,7 +12,14 @@ export default function LikedVideos() {
   useEffect(() => {
     axiosInstance
       .get("/likes/videos")
-      .then((res) => setVideos(res.data.data || []))
+      .then((res) => {
+        const raw = res.data.data || [];
+        // Unwrap: handles both shapes —
+        // [{ video: {...} }] (Like documents with populated video)
+        // or [{...}] (plain video objects already)
+        const unwrapped = raw.map((item) => item.video || item).filter(Boolean);
+        setVideos(unwrapped);
+      })
       .catch(() => setVideos([]))
       .finally(() => setLoading(false));
   }, []);

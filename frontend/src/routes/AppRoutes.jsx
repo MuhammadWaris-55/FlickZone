@@ -26,13 +26,62 @@ export default function AppRoutes() {
         <Route path="/channel/:username" element={<Channel />} />
 
         {/* Protected — all nested here too, so they still get sidebar + navbar */}
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/upload" element={<ProtectedRoute><Upload /></ProtectedRoute>} />
-        <Route path="/liked" element={<ProtectedRoute><LikedVideos /></ProtectedRoute>} />
-        <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
-        <Route path="/my-content" element={<ProtectedRoute><MyContent /></ProtectedRoute>} />
-        <Route path="/collections" element={<ProtectedRoute><Collections /></ProtectedRoute>} />
-        <Route path="/subscribers" element={<ProtectedRoute><Subscribers /></ProtectedRoute>} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/upload"
+          element={
+            <ProtectedRoute>
+              <Upload />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/liked"
+          element={
+            <ProtectedRoute>
+              <LikedVideos />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/history"
+          element={
+            <ProtectedRoute>
+              <History />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-content"
+          element={
+            <ProtectedRoute>
+              <MyContent />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/collections"
+          element={
+            <ProtectedRoute>
+              <Collections />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/subscribers"
+          element={
+            <ProtectedRoute>
+              <Subscribers />
+            </ProtectedRoute>
+          }
+        />
       </Route>
 
       {/* Auth pages — no sidebar/navbar */}

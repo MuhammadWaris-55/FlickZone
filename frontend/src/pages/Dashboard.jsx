@@ -65,7 +65,7 @@ export default function Dashboard() {
         />
         <div>
           <h1 className="font-heading text-xl font-bold">
-            {user?.fullName}'s Dashboard
+            {user?.fullname}'s Dashboard
           </h1>
           <p className="text-xs text-muted-foreground">
             Overview of your channel's performance

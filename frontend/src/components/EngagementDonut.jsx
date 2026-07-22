@@ -1,11 +1,7 @@
 import { motion } from "framer-motion";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 
-const COLORS = [
-  "var(--color-accent)",
-  "var(--color-accent-mid)",
-  "var(--color-accent-deep)",
-];
+const COLORS = ["#3692D3", "#4ADE80", "#F0B429"];
 
 export default function EngagementDonut({ data }) {
   const total = data.reduce((sum, d) => sum + d.value, 0);

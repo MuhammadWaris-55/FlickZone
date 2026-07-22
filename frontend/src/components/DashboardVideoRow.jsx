@@ -72,7 +72,7 @@ export default function DashboardVideoRow({ video, onDelete, onToggle }) {
         </span>
       </div>
 
-      <div className="relative">
+      <div className="relative" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={() => setMenuOpen((p) => !p)}
           className="p-2 rounded-full hover:bg-white/[0.06] transition-colors"
@@ -81,25 +81,33 @@ export default function DashboardVideoRow({ video, onDelete, onToggle }) {
         </button>
 
         {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="absolute right-0 mt-1 w-44 bg-card/80 backdrop-blur-2xl border border-white/[0.08] rounded-lg shadow-xl overflow-hidden z-20"
-          >
-            <button
-              onClick={handleTogglePublish}
-              className="w-full flex items-center gap-2 px-3 py-2.5 text-xs hover:bg-white/[0.05] transition-colors"
+          <>
+            {/* Invisible backdrop to close menu on outside click */}
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setMenuOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 5 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.15 }}
+              className="absolute right-0 bottom-full mb-2 w-44 bg-card/95 backdrop-blur-2xl border border-white/[0.08] rounded-lg shadow-2xl overflow-hidden z-50"
             >
-              {video.isPublished ? <EyeOff size={14} /> : <Eye size={14} />}
-              {video.isPublished ? "Make Private" : "Publish"}
-            </button>
-            <button
-              onClick={handleDelete}
-              className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-destructive hover:bg-destructive/10 transition-colors"
-            >
-              <Trash2 size={14} /> Delete
-            </button>
-          </motion.div>
+              <button
+                onClick={handleTogglePublish}
+                className="w-full flex items-center gap-2 px-3 py-2.5 text-xs hover:bg-white/[0.05] transition-colors"
+              >
+                {video.isPublished ? <EyeOff size={14} /> : <Eye size={14} />}
+                {video.isPublished ? "Make Private" : "Publish"}
+              </button>
+              <button
+                onClick={handleDelete}
+                className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-destructive hover:bg-destructive/10 transition-colors"
+              >
+                <Trash2 size={14} /> Delete
+              </button>
+            </motion.div>
+          </>
         )}
       </div>
     </motion.div>

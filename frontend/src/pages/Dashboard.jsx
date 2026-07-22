@@ -42,10 +42,10 @@ export default function Dashboard() {
   ];
 
   const engagementData = [
-    { name: "Likes", value: stats?.totalLikes ?? 0 },
-    { name: "Comments", value: stats?.totalComments ?? 0 },
-    { name: "Subscribers", value: stats?.totalSubscribers ?? 0 },
-  ];
+  { name: "Likes", value: stats?.totalLikes ?? 0 },
+  { name: "Comments", value: stats?.totalComments ?? 2 },
+  { name: "Subscribers", value: stats?.totalSubscribers ?? 0 },
+];
 
   return (
     <div className="p-6 max-w-5xl mx-auto pb-16 relative">
@@ -65,7 +65,7 @@ export default function Dashboard() {
         />
         <div>
           <h1 className="font-heading text-xl font-bold">
-            {user?.fullname}'s Dashboard
+            Your Dashboard
           </h1>
           <p className="text-xs text-muted-foreground">
             Overview of your channel's performance

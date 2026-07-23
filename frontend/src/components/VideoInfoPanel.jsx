@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import LikeButton from "@/components/LikeButton";
 import SubscribeButton from "@/components/SubscribeButton";
+import AddToPlaylistButton from "@/components/AddToPlaylistButton";
 
 export default function VideoInfoPanel({ video }) {
   return (
@@ -42,11 +43,14 @@ export default function VideoInfoPanel({ video }) {
           />
         </div>
 
-        <LikeButton
-          videoId={video._id}
-          initialLiked={video.isLiked}
-          initialCount={video.likesCount}
-        />
+        <div className="flex items-center gap-2">
+          <LikeButton
+            videoId={video._id}
+            initialLiked={video.isLiked}
+            initialCount={video.likesCount}
+          />
+          <AddToPlaylistButton videoId={video._id} />
+        </div>
       </div>
 
       <motion.p

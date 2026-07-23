@@ -90,7 +90,7 @@ export default function Register() {
         </div>
 
         {/* Avatar — small circular drop zone, overlapping cover like a real profile setup */}
-        <div className="flex items-center gap-4 -mt-10 relative z-10 pl-2">
+       <div className="flex items-center gap-4 mt-4">
           <div
             className={
               fieldErrors.avatar ? "ring-2 ring-destructive rounded-full" : ""

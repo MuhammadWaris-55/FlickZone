@@ -1,20 +1,32 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Eye, EyeOff } from "lucide-react";
 
-export default function FloatingInput({ label, type = "text", value, onChange, name }) {
+export default function FloatingInput({
+  label,
+  type = "text",
+  value,
+  onChange,
+  name,
+}) {
   const [focused, setFocused] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const isActive = focused || value?.length > 0;
+  const isPassword = type === "password";
+  const inputType = isPassword ? (showPassword ? "text" : "password") : type;
 
   return (
     <div className="relative w-full">
       <input
-        type={type}
+        type={inputType}
         name={name}
         value={value}
         onChange={onChange}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        className="w-full bg-card/60 border border-border rounded-lg px-4 pt-5 pb-2 text-sm outline-none focus:border-accent transition-colors"
+        className={`w-full bg-card/60 border border-border rounded-lg px-4 pt-5 pb-2 text-sm outline-none focus:border-accent transition-colors ${
+          isPassword ? "pr-10" : ""
+        }`}
       />
       <motion.label
         animate={{
@@ -28,6 +40,17 @@ export default function FloatingInput({ label, type = "text", value, onChange, n
       >
         {label}
       </motion.label>
+
+      {isPassword && (
+        <button
+          type="button"
+          onClick={() => setShowPassword((prev) => !prev)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          tabIndex={-1}
+        >
+          {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+        </button>
+      )}
     </div>
   );
 }

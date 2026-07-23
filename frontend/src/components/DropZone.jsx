@@ -2,7 +2,14 @@ import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { UploadCloud, FileVideo, X } from "lucide-react";
 
-export default function DropZone({ label, accept, onFileSelect, previewType = "video" }) {
+export default function DropZone({
+  label,
+  accept,
+  onFileSelect,
+  previewType = "video",
+  shape = "rect",
+  aspect = "video",
+}) {
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -22,18 +29,32 @@ export default function DropZone({ label, accept, onFileSelect, previewType = "v
     onFileSelect(null);
   };
 
+  const shapeClasses =
+    shape === "circle" ? "w-20 h-20 rounded-full" : "rounded-xl";
+  const aspectClass =
+    shape === "circle"
+      ? ""
+      : aspect === "banner"
+        ? "aspect-[4/1]"
+        : "aspect-video";
+
   return (
     <div
       onClick={() => inputRef.current?.click()}
-      onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+      onDragOver={(e) => {
+        e.preventDefault();
+        setDragActive(true);
+      }}
       onDragLeave={() => setDragActive(false)}
       onDrop={(e) => {
         e.preventDefault();
         setDragActive(false);
         handleFile(e.dataTransfer.files[0]);
       }}
-      className={`relative rounded-xl border-2 border-dashed cursor-pointer overflow-hidden transition-colors ${
-        dragActive ? "border-accent bg-accent/5" : "border-border hover:border-accent/40"
+      className={`relative border-2 border-dashed cursor-pointer overflow-hidden transition-colors ${shapeClasses} ${aspectClass} ${
+        dragActive
+          ? "border-accent bg-accent/5"
+          : "border-border hover:border-accent/40"
       }`}
     >
       <input
@@ -45,32 +66,46 @@ export default function DropZone({ label, accept, onFileSelect, previewType = "v
       />
 
       {!file ? (
-        <div className="flex flex-col items-center justify-center gap-2 py-10 text-center px-4">
-          <motion.div
-            animate={dragActive ? { scale: 1.1, y: -4 } : { scale: 1, y: 0 }}
+        <div
+          className={`flex flex-col items-center justify-center gap-1.5 text-center px-2 h-full ${shape === "circle" ? "" : "py-8"}`}
+        >
+          <UploadCloud
+            size={shape === "circle" ? 18 : 28}
             className="text-accent"
-          >
-            <UploadCloud size={32} />
-          </motion.div>
-          <p className="text-sm font-medium">{label}</p>
-          <p className="text-xs text-muted-foreground">Drag & drop or click to browse</p>
+          />
+          {shape !== "circle" && (
+            <>
+              <p className="text-xs font-medium">{label}</p>
+              <p className="text-[10px] text-muted-foreground">
+                Drag & drop or click
+              </p>
+            </>
+          )}
         </div>
       ) : (
-        <div className="relative">
+        <div className="relative w-full h-full">
           {previewType === "video" ? (
-            <video src={preview} className="w-full aspect-video object-cover" muted />
+            <video src={preview} className="w-full h-full object-cover" muted />
           ) : (
-            <img src={preview} alt="preview" className="w-full aspect-video object-cover" />
+            <img
+              src={preview}
+              alt="preview"
+              className="w-full h-full object-cover"
+            />
           )}
-          <div className="absolute inset-0 bg-background/40 flex items-center justify-center gap-2 opacity-0 hover:opacity-100 transition-opacity">
-            <FileVideo size={16} />
-            <span className="text-xs">{file.name}</span>
-          </div>
+          {shape !== "circle" && (
+            <div className="absolute inset-0 bg-background/40 flex items-center justify-center gap-2 opacity-0 hover:opacity-100 transition-opacity">
+              <FileVideo size={16} />
+              <span className="text-xs">{file.name}</span>
+            </div>
+          )}
           <button
             onClick={clearFile}
-            className="absolute top-2 right-2 bg-background/80 rounded-full p-1.5 hover:bg-destructive/80 transition-colors"
+            className={`absolute bg-background/80 rounded-full p-1 hover:bg-destructive/80 transition-colors ${
+              shape === "circle" ? "top-0 right-0" : "top-2 right-2 p-1.5"
+            }`}
           >
-            <X size={14} />
+            <X size={12} />
           </button>
         </div>
       )}

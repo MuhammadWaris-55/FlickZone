@@ -16,6 +16,7 @@ import MyContent from "@/pages/MyContent";
 import Collections from "@/pages/Collections";
 import Subscribers from "@/pages/Subscribers";
 import Search from "@/pages/Search";
+import Subscriptions from "@/pages/Subscriptions";
 
 export default function AppRoutes() {
   return (
@@ -81,6 +82,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute>
               <Subscribers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/subscriptions"
+          element={
+            <ProtectedRoute>
+              <Subscriptions />
             </ProtectedRoute>
           }
         />

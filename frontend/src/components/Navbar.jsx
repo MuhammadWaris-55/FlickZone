@@ -10,11 +10,14 @@ import {
   Upload,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { searchVideos } from "@/api/videoApi";
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -28,9 +31,28 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (search.trim().length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    const timeout = setTimeout(() => {
+      searchVideos(search)
+        .then((data) => {
+          setSuggestions((data.docs || data || []).slice(0, 5));
+        })
+        .catch(() => setSuggestions([]));
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [search]);
+
   const handleSearch = (e) => {
     e.preventDefault();
-    if (search.trim()) navigate(`/search?q=${encodeURIComponent(search)}`);
+    if (search.trim()) {
+      navigate(`/search?q=${encodeURIComponent(search)}`);
+      setShowSuggestions(false);
+    }
   };
 
   return (
@@ -44,10 +66,44 @@ export default function Navbar() {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          onFocus={() => setShowSuggestions(true)}
+          onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
           placeholder="Search FlickZone..."
           className="w-full bg-card/40 border border-border rounded-full pl-10 pr-4 py-2 text-sm outline-none
                      focus:border-accent focus:bg-card/70 transition-all duration-200"
         />
+
+        <AnimatePresence>
+          {showSuggestions && suggestions.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.15 }}
+              className="absolute top-full mt-2 w-full bg-card/90 backdrop-blur-2xl border border-white/[0.08] rounded-xl shadow-2xl overflow-hidden z-50"
+            >
+              {suggestions.map((video) => (
+                <button
+                  key={video._id}
+                  type="button"
+                  onClick={() => {
+                    navigate(`/watch/${video._id}`);
+                    setShowSuggestions(false);
+                    setSearch("");
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-white/[0.05] transition-colors"
+                >
+                  <img
+                    src={video.thumbnail}
+                    alt=""
+                    className="w-14 h-9 rounded object-cover shrink-0"
+                  />
+                  <span className="text-xs truncate">{video.title}</span>
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </form>
 
       <div className="flex-1" />
@@ -91,7 +147,7 @@ export default function Navbar() {
                            rounded-xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.6)] overflow-hidden z-50"
               >
                 <div className="px-4 py-3 border-b border-white/[0.06]">
-                  <p className="text-sm font-medium">{user?.fullName}</p>
+                  <p className="text-sm font-medium">{user?.fullname}</p>
                   <p className="text-xs text-muted-foreground">
                     @{user?.username}
                   </p>

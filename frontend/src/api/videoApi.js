@@ -1,8 +1,8 @@
 import axiosInstance from "@/api/axiosInstance";
 
 export const getAllVideos = async (params = {}) => {
-    const res = await axiosInstance.get("/videos", { params });
-    return res.data.data; // adjust based on your ApiResponse shape (docs, totalDocs, etc.)
+  const res = await axiosInstance.get("/videos", { params });
+  return res.data.data; // adjust based on your ApiResponse shape (docs, totalDocs, etc.)
 };
 
 export const getVideoById = async (videoId) => {
@@ -23,5 +23,10 @@ export const publishVideo = async (formData, onUploadProgress) => {
 
 export const getVideosByOwner = async (ownerId) => {
   const res = await axiosInstance.get("/videos", { params: { userId: ownerId } });
+  return res.data.data;
+};
+
+export const searchVideos = async (query) => {
+  const res = await axiosInstance.get("/videos", { params: { query } });
   return res.data.data;
 };

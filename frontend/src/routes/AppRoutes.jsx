@@ -15,6 +15,7 @@ import History from "@/pages/History";
 import MyContent from "@/pages/MyContent";
 import Collections from "@/pages/Collections";
 import Subscribers from "@/pages/Subscribers";
+import Search from "@/pages/Search";
 
 export default function AppRoutes() {
   return (
@@ -24,6 +25,7 @@ export default function AppRoutes() {
         <Route path="/" element={<Home />} />
         <Route path="/watch/:videoId" element={<Watch />} />
         <Route path="/channel/:username" element={<Channel />} />
+        <Route path="/search" element={<Search />} />
 
         {/* Protected — all nested here too, so they still get sidebar + navbar */}
         <Route

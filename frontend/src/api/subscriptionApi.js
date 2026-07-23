@@ -6,6 +6,6 @@ export const toggleSubscription = async (channelId) => {
 };
 
 export const getSubscribedChannels = async (userId) => {
-  const res = await axiosInstance.get(`/subscriptions/c/${userId}`);
+  const res = await axiosInstance.get(`/subscriptions/u/${userId}`);
   return res.data.data;
 };

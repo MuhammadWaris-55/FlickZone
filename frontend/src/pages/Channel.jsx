@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useChannel } from "@/hooks/useChannel";
 import { getVideosByOwner } from "@/api/videoApi";
+import { getSubscribedChannels } from "@/api/subscriptionApi";
 import ChannelBanner from "@/components/ChannelBanner";
 import ChannelTabs from "@/components/ChannelTabs";
 import VideoCard from "@/components/VideoCard";
@@ -16,6 +17,9 @@ export default function Channel() {
   const [channelVideos, setChannelVideos] = useState([]);
   const [videosLoading, setVideosLoading] = useState(true);
 
+  const [subscribedChannels, setSubscribedChannels] = useState([]);
+  const [subsLoading, setSubsLoading] = useState(true);
+
   useEffect(() => {
     if (channel?._id) {
       setVideosLoading(true);
@@ -25,6 +29,16 @@ export default function Channel() {
         .finally(() => setVideosLoading(false));
     }
   }, [channel?._id]);
+
+  useEffect(() => {
+    if (channel?._id && activeTab === "Subscribed") {
+      setSubsLoading(true);
+      getSubscribedChannels(channel._id)
+        .then((data) => setSubscribedChannels(data || []))
+        .catch(() => setSubscribedChannels([]))
+        .finally(() => setSubsLoading(false));
+    }
+  }, [channel?._id, activeTab]);
 
   if (loading) {
     return (
@@ -76,10 +90,37 @@ export default function Channel() {
             {activeTab === "Tweets" && (
               <p className="text-muted-foreground text-sm">No tweets yet.</p>
             )}
+
             {activeTab === "Subscribed" && (
-              <p className="text-muted-foreground text-sm">
-                Not subscribed to any channels yet.
-              </p>
+              <div className="space-y-3">
+                {subsLoading ? (
+                  <p className="text-muted-foreground text-sm">Loading...</p>
+                ) : subscribedChannels.length ? (
+                  subscribedChannels.map((sub) => {
+                    const ch = sub.channel || sub;
+                    return (
+                      <Link
+                        key={ch._id}
+                        to={`/channel/${ch.username}`}
+                        className="flex items-center gap-3 bg-card/40 backdrop-blur-xl border border-border rounded-xl p-3 hover:border-accent/30 transition-colors"
+                      >
+                        <img
+                          src={ch.avatar}
+                          alt=""
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <span className="text-sm font-medium">
+                          {ch.username}
+                        </span>
+                      </Link>
+                    );
+                  })
+                ) : (
+                  <p className="text-muted-foreground text-sm">
+                    Not subscribed to any channels yet.
+                  </p>
+                )}
+              </div>
             )}
           </motion.div>
         </AnimatePresence>

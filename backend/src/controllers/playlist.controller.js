@@ -32,17 +32,22 @@ const createPlaylist = asyncHandler(async (req, res) => {
 const getUserPlaylists = asyncHandler(async (req, res) => {
     const { userId } = req.params
 
-    // make sure the id actually looks like a valid mongo ObjectId
     if (!isValidObjectId(userId)) {
         throw new ApiError(400, "Invalid user id")
     }
 
-    // aggregate all playlists belonging to this user
-    // along with basic video count + total views, useful for a "My Playlists" page
     const playlists = await Playlist.aggregate([
         {
             $match: {
                 owner: new mongoose.Types.ObjectId(userId)
+            }
+        },
+        {
+            // Keep the original array of video IDs before $lookup replaces it,
+            // so the frontend can check "is video X already in this playlist"
+            // without needing the full video documents
+            $addFields: {
+                videoIds: "$videos"
             }
         },
         {
@@ -60,6 +65,10 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
                 },
                 totalViews: {
                     $sum: "$videos.views"
+                },
+                // Use the most recently added video's thumbnail as the playlist cover
+                thumbnail: {
+                    $arrayElemAt: ["$videos.thumbnail", -1]
                 }
             }
         },
@@ -69,6 +78,8 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
                 description: 1,
                 totalVideos: 1,
                 totalViews: 1,
+                thumbnail: 1,
+                videoIds: 1,
                 updatedAt: 1
             }
         }

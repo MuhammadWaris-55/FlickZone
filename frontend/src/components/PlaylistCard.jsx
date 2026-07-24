@@ -27,8 +27,11 @@ export default function PlaylistCard({ playlist, index = 0 }) {
     mouseY.set(0);
   };
 
-  const thumbnail = playlist.videos?.[0]?.thumbnail;
-  const videoCount = playlist.videos?.length ?? 0;
+  const thumbnail = playlist.thumbnail;
+  const videoCount = playlist.totalVideos ?? 0;
+
+  // const thumbnail = playlist.videos?.[0]?.thumbnail;
+  // const videoCount = playlist.videos?.length ?? 0;
 
   return (
     <motion.div

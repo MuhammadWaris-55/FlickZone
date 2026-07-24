@@ -10,6 +10,7 @@ export default function AddToPlaylistButton({ videoId }) {
   const [open, setOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [busyId, setBusyId] = useState(null);
+  const [toast, setToast] = useState("");
   const ref = useRef(null);
 
   useEffect(() => {
@@ -20,18 +21,20 @@ export default function AddToPlaylistButton({ videoId }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const isInPlaylist = (playlist) =>
-    playlist.videos?.some((v) => (v._id || v) === videoId);
+  const isInPlaylist = (playlist) => playlist.videoIds?.includes(videoId);
 
   const handleToggle = async (playlist) => {
     setBusyId(playlist._id);
     try {
       if (isInPlaylist(playlist)) {
         await removeVideoFromPlaylist(playlist._id, videoId);
+        setToast(`Removed from ${playlist.name}`);
       } else {
         await addVideoToPlaylist(playlist._id, videoId);
+        setToast(`Added to ${playlist.name}`);
       }
-      refetch();
+      await refetch();
+      setTimeout(() => setToast(""), 1800);
     } finally {
       setBusyId(null);
     }
@@ -47,6 +50,19 @@ export default function AddToPlaylistButton({ videoId }) {
         <ListPlus size={18} />
         <span className="text-sm font-body">Save</span>
       </motion.button>
+
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            className="absolute -top-9 left-0 bg-accent text-accent-foreground text-xs font-medium px-3 py-1.5 rounded-full whitespace-nowrap z-50"
+          >
+            {toast}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {open && (

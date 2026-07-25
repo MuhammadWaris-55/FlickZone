@@ -9,6 +9,7 @@ import {
   LogOut,
   Upload,
 } from "lucide-react";
+import { Settings as SettingsIcon } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { searchVideos } from "@/api/videoApi";
 
@@ -174,6 +175,13 @@ export default function Navbar() {
                   className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-white/[0.05] transition-colors"
                 >
                   <Upload size={16} /> Upload Video
+                </Link>
+                <Link
+                  to="/settings"
+                  onClick={() => setDropdownOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-white/[0.05] transition-colors"
+                >
+                  <SettingsIcon size={16} /> Settings
                 </Link>
                 <button
                   onClick={() => {

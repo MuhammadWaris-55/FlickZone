@@ -18,6 +18,7 @@ import Subscribers from "@/pages/Subscribers";
 import Search from "@/pages/Search";
 import Subscriptions from "@/pages/Subscriptions";
 import PlaylistDetail from "@/pages/PlaylistDetail";
+import Settings from "@/pages/Settings";
 
 export default function AppRoutes() {
   return (
@@ -99,6 +100,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute>
               <PlaylistDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Settings />
             </ProtectedRoute>
           }
         />

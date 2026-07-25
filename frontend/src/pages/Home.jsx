@@ -8,8 +8,6 @@ export default function Home() {
 
   const sortedByViews = [...videos].sort((a, b) => b.views - a.views);
   const featuredVideos = sortedByViews.slice(0, 5);
-  const featuredIds = new Set(featuredVideos.map((v) => v._id));
-  const gridVideos = videos.filter((v) => !featuredIds.has(v._id));
 
   return (
     <div className="p-6">
@@ -18,7 +16,7 @@ export default function Home() {
       )}
 
       <h1 className="font-heading text-2xl font-bold mb-6">
-        {loading ? "Home" : "Trending Now"}
+        {loading ? "Home" : "All Videos"}
       </h1>
 
       {error && (
@@ -30,7 +28,7 @@ export default function Home() {
           ? Array.from({ length: 8 }).map((_, i) => (
               <VideoCardSkeleton key={i} />
             ))
-          : gridVideos.map((video, i) => (
+          : videos.map((video, i) => (
               <VideoCard key={video._id} video={video} index={i} />
             ))}
       </div>

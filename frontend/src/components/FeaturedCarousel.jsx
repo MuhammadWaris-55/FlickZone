@@ -19,7 +19,6 @@ export default function FeaturedCarousel({ videos }) {
   const next = useCallback(() => goTo(index + 1, 1), [index, goTo]);
   const prev = useCallback(() => goTo(index - 1, -1), [index, goTo]);
 
-  // Auto-advance every 2s, resets whenever index changes (manual or auto)
   useEffect(() => {
     clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
@@ -30,7 +29,7 @@ export default function FeaturedCarousel({ videos }) {
   }, [index, videos.length]);
 
   const handleManualNav = (fn) => {
-    clearTimeout(timerRef.current); // pause auto-rotate briefly on manual interaction
+    clearTimeout(timerRef.current);
     fn();
   };
 
@@ -59,7 +58,7 @@ export default function FeaturedCarousel({ videos }) {
           <img
             src={video.thumbnail}
             alt={video.title}
-            className="w-full h-full object-cover scale-110"
+            className="absolute inset-0 w-full h-full object-cover scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/10" />
           <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-transparent" />
@@ -101,7 +100,6 @@ export default function FeaturedCarousel({ videos }) {
         </motion.div>
       </AnimatePresence>
 
-      {/* Left/right arrows — visible on hover */}
       <button
         onClick={() => handleManualNav(prev)}
         className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2.5 rounded-full bg-background/50 backdrop-blur-md border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background/80"
@@ -115,7 +113,6 @@ export default function FeaturedCarousel({ videos }) {
         <ChevronRight size={20} />
       </button>
 
-      {/* Dot indicators */}
       <div className="absolute bottom-5 right-8 z-20 flex gap-2">
         {videos.map((_, i) => (
           <button

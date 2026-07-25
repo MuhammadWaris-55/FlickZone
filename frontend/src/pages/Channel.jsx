@@ -4,14 +4,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useChannel } from "@/hooks/useChannel";
 import { getVideosByOwner } from "@/api/videoApi";
 import { getSubscribedChannels } from "@/api/subscriptionApi";
+import { getUserTweets } from "@/api/tweetApi";
+import { useAuth } from "@/context/AuthContext";
 import ChannelBanner from "@/components/ChannelBanner";
 import ChannelTabs from "@/components/ChannelTabs";
 import VideoCard from "@/components/VideoCard";
 import VideoCardSkeleton from "@/components/VideoCardSkeleton";
+import TweetItem from "@/components/TweetItem";
+import CreateTweetBox from "@/components/CreateTweetBox";
 
 export default function Channel() {
   const { username } = useParams();
   const { channel, loading } = useChannel(username);
+  const { user: loggedInUser } = useAuth();
   const [activeTab, setActiveTab] = useState("Videos");
 
   const [channelVideos, setChannelVideos] = useState([]);
@@ -19,6 +24,11 @@ export default function Channel() {
 
   const [subscribedChannels, setSubscribedChannels] = useState([]);
   const [subsLoading, setSubsLoading] = useState(true);
+
+  const [tweets, setTweets] = useState([]);
+  const [tweetsLoading, setTweetsLoading] = useState(true);
+
+  const isOwnChannel = loggedInUser?._id === channel?._id;
 
   useEffect(() => {
     if (channel?._id) {
@@ -39,6 +49,40 @@ export default function Channel() {
         .finally(() => setSubsLoading(false));
     }
   }, [channel?._id, activeTab]);
+
+  useEffect(() => {
+    if (channel?._id && activeTab === "Tweets") {
+      setTweetsLoading(true);
+      getUserTweets(channel._id)
+        .then((data) => setTweets(data || []))
+        .catch(() => setTweets([]))
+        .finally(() => setTweetsLoading(false));
+    }
+  }, [channel?._id, activeTab]);
+
+  const handleTweetCreated = (tweet) => {
+    setTweets((prev) => [
+      {
+        ...tweet,
+        ownerDetails: {
+          username: loggedInUser.username,
+          avatar: loggedInUser.avatar,
+          _id: loggedInUser._id,
+        },
+      },
+      ...prev,
+    ]);
+  };
+
+  const handleTweetUpdate = (tweetId, newContent) => {
+    setTweets((prev) =>
+      prev.map((t) => (t._id === tweetId ? { ...t, content: newContent } : t))
+    );
+  };
+
+  const handleTweetDelete = (tweetId) => {
+    setTweets((prev) => prev.filter((t) => t._id !== tweetId));
+  };
 
   if (loading) {
     return (
@@ -87,8 +131,32 @@ export default function Channel() {
             {activeTab === "Playlists" && (
               <p className="text-muted-foreground text-sm">No playlists yet.</p>
             )}
+
             {activeTab === "Tweets" && (
-              <p className="text-muted-foreground text-sm">No tweets yet.</p>
+              <div>
+                {isOwnChannel && (
+                  <CreateTweetBox onCreated={handleTweetCreated} />
+                )}
+
+                {tweetsLoading ? (
+                  <p className="text-muted-foreground text-sm">Loading...</p>
+                ) : tweets.length ? (
+                  <div className="space-y-3">
+                    {tweets.map((tweet) => (
+                      <TweetItem
+                        key={tweet._id}
+                        tweet={tweet}
+                        onUpdate={handleTweetUpdate}
+                        onDelete={handleTweetDelete}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-sm">
+                    No tweets yet.
+                  </p>
+                )}
+              </div>
             )}
 
             {activeTab === "Subscribed" && (

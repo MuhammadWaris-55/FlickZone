@@ -3,13 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Search,
-  Bell,
   User,
   LayoutDashboard,
   LogOut,
   Upload,
 } from "lucide-react";
 import { Settings as SettingsIcon } from "lucide-react";
+import NotificationsDropdown from "@/components/NotificationsDropdown";
 import { useAuth } from "@/context/AuthContext";
 import { searchVideos } from "@/api/videoApi";
 
@@ -110,15 +110,7 @@ export default function Navbar() {
       <div className="flex-1" />
 
       {/* Notifications */}
-      <motion.button
-        whileHover={{ scale: 1.08, rotate: [0, -8, 8, 0] }}
-        whileTap={{ scale: 0.92 }}
-        transition={{ duration: 0.3 }}
-        className="relative p-2.5 rounded-full hover:bg-white/[0.06] transition-colors"
-      >
-        <Bell size={19} />
-        <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full ring-2 ring-background" />
-      </motion.button>
+      <NotificationsDropdown />
 
       {/* Profile / Auth */}
       {isAuthenticated ? (

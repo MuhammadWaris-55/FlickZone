@@ -19,6 +19,7 @@ import Search from "@/pages/Search";
 import Subscriptions from "@/pages/Subscriptions";
 import PlaylistDetail from "@/pages/PlaylistDetail";
 import Settings from "@/pages/Settings";
+import NotFound from "@/pages/NotFound";
 
 export default function AppRoutes() {
   return (
@@ -29,6 +30,7 @@ export default function AppRoutes() {
         <Route path="/watch/:videoId" element={<Watch />} />
         <Route path="/channel/:username" element={<Channel />} />
         <Route path="/search" element={<Search />} />
+        <Route path="*" element={<NotFound />} />
 
         {/* Protected — all nested here too, so they still get sidebar + navbar */}
         <Route

@@ -10,6 +10,9 @@ import {
   Settings,
   Captions,
   Check,
+  ChevronLeft,
+  ChevronRight,
+  Download,
 } from "lucide-react";
 
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
@@ -28,7 +31,8 @@ export default function CustomVideoPlayer({ src }) {
   const [volume, setVolume] = useState(1);
   const [muted, setMuted] = useState(false);
   const [speed, setSpeed] = useState(1);
-  const [showSpeedMenu, setShowSpeedMenu] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsPanel, setSettingsPanel] = useState("main");
   const [captionsOn, setCaptionsOn] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
@@ -37,7 +41,7 @@ export default function CustomVideoPlayer({ src }) {
     if (!t || isNaN(t)) return "0:00";
     const m = Math.floor(t / 60);
     const s = Math.floor(t % 60);
-    return `${m}:${String(s).padStart(2, "0")}`;
+    return m + ":" + String(s).padStart(2, "0");
   };
 
   const triggerBigIcon = (type) => {
@@ -86,8 +90,7 @@ export default function CustomVideoPlayer({ src }) {
   useEffect(() => {
     const handleFsChange = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener("fullscreenchange", handleFsChange);
-    return () =>
-      document.removeEventListener("fullscreenchange", handleFsChange);
+    return () => document.removeEventListener("fullscreenchange", handleFsChange);
   }, []);
 
   const resetHideTimer = useCallback(() => {
@@ -126,7 +129,8 @@ export default function CustomVideoPlayer({ src }) {
   const changeSpeed = (s) => {
     videoRef.current.playbackRate = s;
     setSpeed(s);
-    setShowSpeedMenu(false);
+    setSettingsOpen(false);
+    setSettingsPanel("main");
   };
 
   const toggleFullscreen = () => {
@@ -136,6 +140,35 @@ export default function CustomVideoPlayer({ src }) {
       document.exitFullscreen();
     }
   };
+
+  const closeSettings = () => {
+    setSettingsOpen(false);
+    setSettingsPanel("main");
+  };
+
+  const timeLabel = formatTime(currentTime) + " / " + formatTime(duration);
+  const speedLabel = String(speed) + "x";
+
+  let playPauseIcon;
+  if (isPlaying) {
+    playPauseIcon = <Pause size={18} fill="currentColor" />;
+  } else {
+    playPauseIcon = <Play size={18} fill="currentColor" />;
+  }
+
+  let volumeIcon;
+  if (muted || volume === 0) {
+    volumeIcon = <VolumeX size={18} />;
+  } else {
+    volumeIcon = <Volume2 size={18} />;
+  }
+
+  let fullscreenIcon;
+  if (isFullscreen) {
+    fullscreenIcon = <Minimize size={18} />;
+  } else {
+    fullscreenIcon = <Maximize size={18} />;
+  }
 
   return (
     <div
@@ -151,7 +184,6 @@ export default function CustomVideoPlayer({ src }) {
         className="w-full h-full cursor-pointer"
       />
 
-      {/* Center burst play/pause animation */}
       <AnimatePresence>
         {showBigIcon && (
           <motion.div
@@ -161,7 +193,7 @@ export default function CustomVideoPlayer({ src }) {
             transition={{ duration: 0.35, ease: "easeOut" }}
             className="absolute inset-0 flex items-center justify-center pointer-events-none"
           >
-            <div className="bg-background/60 backdrop-blur-md rounded-full p-5">
+            <div className="bg-black/50 backdrop-blur-md rounded-full p-5">
               {bigIcon === "play" ? (
                 <Play size={32} fill="white" className="text-white ml-1" />
               ) : (
@@ -172,7 +204,6 @@ export default function CustomVideoPlayer({ src }) {
         )}
       </AnimatePresence>
 
-      {/* Persistent center play button when paused */}
       <AnimatePresence>
         {!isPlaying && !showBigIcon && (
           <motion.button
@@ -182,18 +213,13 @@ export default function CustomVideoPlayer({ src }) {
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.92 }}
             onClick={togglePlay}
-            className="absolute inset-0 m-auto w-16 h-16 flex items-center justify-center bg-accent/90 backdrop-blur-md rounded-full shadow-lg"
+            className="absolute inset-0 m-auto w-16 h-16 flex items-center justify-center bg-black/50 backdrop-blur-md rounded-full shadow-lg"
           >
-            <Play
-              size={26}
-              fill="currentColor"
-              className="text-accent-foreground ml-1"
-            />
+            <Play size={26} fill="white" className="text-white ml-1" />
           </motion.button>
         )}
       </AnimatePresence>
 
-      {/* Bottom control bar */}
       <AnimatePresence>
         {controlsVisible && (
           <motion.div
@@ -203,115 +229,150 @@ export default function CustomVideoPlayer({ src }) {
             transition={{ duration: 0.2 }}
             className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-3 pb-2 pt-8"
           >
-            {/* Progress bar */}
             <div
               onClick={handleSeek}
               className="relative h-1.5 bg-white/20 rounded-full cursor-pointer mb-3 group/bar"
             >
               <div
                 className="absolute top-0 left-0 h-full bg-accent rounded-full"
-                style={{ width: `${progress}%` }}
+                style={{ width: progress + "%" }}
               />
               <div
                 className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-accent rounded-full opacity-0 group-hover/bar:opacity-100 transition-opacity"
-                style={{ left: `calc(${progress}% - 6px)` }}
+                style={{ left: "calc(" + progress + "% - 6px)" }}
               />
             </div>
 
             <div className="flex items-center justify-between text-white">
               <div className="flex items-center gap-3">
-                <button
-                  onClick={togglePlay}
-                  className="hover:text-accent transition-colors"
-                >
-                  {isPlaying ? (
-                    <Pause size={18} fill="currentColor" />
-                  ) : (
-                    <Play size={18} fill="currentColor" />
-                  )}
+                <button onClick={togglePlay} className="hover:text-accent transition-colors">
+                  {playPauseIcon}
                 </button>
 
-                <div className="flex items-center gap-1.5 group/vol">
-                  <button
-                    onClick={toggleMute}
-                    className="hover:text-accent transition-colors"
-                  >
-                    {muted || volume === 0 ? (
-                      <VolumeX size={18} />
-                    ) : (
-                      <Volume2 size={18} />
-                    )}
+                <div className="flex items-center gap-0 group/vol">
+                  <button onClick={toggleMute} className="hover:text-accent transition-colors shrink-0">
+                    {volumeIcon}
                   </button>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.05"
-                    value={muted ? 0 : volume}
-                    onChange={handleVolumeChange}
-                    className="w-0 group-hover/vol:w-16 transition-all duration-200 accent-[var(--color-accent)] h-1"
-                  />
+                  <div className="w-0 group-hover/vol:w-16 group-hover/vol:ml-2 overflow-hidden transition-all duration-200">
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.05"
+                      value={muted ? 0 : volume}
+                      onChange={handleVolumeChange}
+                      className="w-16 accent-[var(--color-accent)] h-1"
+                    />
+                  </div>
                 </div>
 
-                <span className="text-xs font-body tabular-nums">
-                  {formatTime(currentTime)} / {formatTime(duration)}
-                </span>
+                <span className="text-xs font-body tabular-nums">{timeLabel}</span>
               </div>
 
               <div className="flex items-center gap-3">
-                {/* Captions toggle */}
                 <button
                   onClick={() => setCaptionsOn((p) => !p)}
                   title="Captions"
-                  className={`hover:text-accent transition-colors ${captionsOn ? "text-accent" : ""}`}
+                  className={captionsOn ? "text-accent transition-colors" : "hover:text-accent transition-colors"}
                 >
                   <Captions size={18} />
                 </button>
 
-                {/* Speed menu */}
                 <div className="relative">
                   <button
-                    onClick={() => setShowSpeedMenu((p) => !p)}
-                    className="flex items-center gap-1 hover:text-accent transition-colors text-xs font-medium"
+                    onClick={() => setSettingsOpen((p) => !p)}
+                    className={settingsOpen ? "text-accent transition-colors" : "hover:text-accent transition-colors"}
                   >
-                    <Settings size={17} />
-                    {speed}x
+                    <Settings size={18} />
                   </button>
+
                   <AnimatePresence>
-                    {showSpeedMenu && (
+                    {settingsOpen && (
                       <motion.div
                         initial={{ opacity: 0, y: 6, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 6, scale: 0.95 }}
                         transition={{ duration: 0.12 }}
-                        className="absolute bottom-8 right-0 bg-background/95 backdrop-blur-xl border border-white/10 rounded-lg overflow-hidden w-24 shadow-2xl"
+                        className="absolute bottom-8 right-0 bg-background/95 backdrop-blur-xl border border-white/10 rounded-lg overflow-hidden w-48 shadow-2xl text-white"
                       >
-                        {SPEEDS.map((s) => (
-                          <button
-                            key={s}
-                            onClick={() => changeSpeed(s)}
-                            className="w-full flex items-center justify-between px-3 py-2 text-xs hover:bg-white/10 transition-colors"
-                          >
-                            {s}x{" "}
-                            {s === speed && (
+                        {settingsPanel === "main" && (
+                          <>
+                            <button
+                              onClick={() => setSettingsPanel("speed")}
+                              className="w-full flex items-center justify-between px-3 py-2.5 text-xs hover:bg-white/10 transition-colors"
+                            >
+                              <span>Playback speed</span>
+                              <span className="flex items-center gap-1 text-muted-foreground">
+                                <span>{speedLabel}</span>
+                                <ChevronRight size={12} />
+                              </span>
+                            </button>
+                            <button
+                              onClick={() => setSettingsPanel("quality")}
+                              className="w-full flex items-center justify-between px-3 py-2.5 text-xs hover:bg-white/10 transition-colors"
+                            >
+                              <span>Quality</span>
+                              <span className="flex items-center gap-1 text-muted-foreground">
+                                <span>Auto</span>
+                                <ChevronRight size={12} />
+                              </span>
+                            </button>
+                           < a 
+                              href={src}
+                              download
+                              onClick={closeSettings}
+                              className="w-full flex items-center gap-2 px-3 py-2.5 text-xs hover:bg-white/10 transition-colors border-t border-white/10"
+                            >
+                              <Download size={13} />
+                              <span>Download</span>
+                            </a>
+                          </>
+                        )}
+
+                        {settingsPanel === "speed" && (
+                          <>
+                            <button
+                              onClick={() => setSettingsPanel("main")}
+                              className="w-full flex items-center gap-2 px-3 py-2.5 text-xs hover:bg-white/10 transition-colors border-b border-white/10"
+                            >
+                              <ChevronLeft size={13} />
+                              <span>Playback speed</span>
+                            </button>
+                            {SPEEDS.map((s) => (
+                              <button
+                                key={s}
+                                onClick={() => changeSpeed(s)}
+                                className="w-full flex items-center justify-between px-3 py-2 text-xs hover:bg-white/10 transition-colors"
+                              >
+                                <span>{s}x</span>
+                                {s === speed && <Check size={12} className="text-accent" />}
+                              </button>
+                            ))}
+                          </>
+                        )}
+
+                        {settingsPanel === "quality" && (
+                          <>
+                            <button
+                              onClick={() => setSettingsPanel("main")}
+                              className="w-full flex items-center gap-2 px-3 py-2.5 text-xs hover:bg-white/10 transition-colors border-b border-white/10"
+                            >
+                              <ChevronLeft size={13} />
+                              <span>Quality</span>
+                            </button>
+                            <button className="w-full flex items-center justify-between px-3 py-2 text-xs hover:bg-white/10 transition-colors">
+                              <span>Auto</span>
                               <Check size={12} className="text-accent" />
-                            )}
-                          </button>
-                        ))}
+                            </button>
+                          </>
+                        )}
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
 
-                <button
-                  onClick={toggleFullscreen}
-                  className="hover:text-accent transition-colors"
-                >
-                  {isFullscreen ? (
-                    <Minimize size={18} />
-                  ) : (
-                    <Maximize size={18} />
-                  )}
+                <button onClick={toggleFullscreen} className="hover:text-accent transition-colors">
+                  {fullscreenIcon}
                 </button>
               </div>
             </div>

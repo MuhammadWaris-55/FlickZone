@@ -15,6 +15,6 @@ export const mobileNavItems = [
   { label: "Home", icon: Home, path: "/" },
   { label: "Subscriptions", icon: Users, path: "/subscriptions" },
   { label: "Upload", icon: UploadIcon, path: "/upload", isCenter: true },
-  { label: "Library", icon: FolderOpen, path: "/library" },
-  { label: "Profile", icon: User, path: "/profile" },
+  { label: "Library", icon: FolderOpen, path: "/collections" },
+  { label: "Profile", icon: User, path: "/profile" }, // fixed below
 ];

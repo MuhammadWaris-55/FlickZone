@@ -16,5 +16,5 @@ export function useComments(videoId) {
     setComments((prev) => [newComment, ...prev]);
   };
 
-  return { comments, loading, postComment };
+  return { comments, setComments, loading, postComment };
 }

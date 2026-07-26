@@ -134,20 +134,40 @@
 
 @layer utilities {
   .shimmer {
-    background: linear-gradient(
-      90deg,
-      var(--color-accent-deep) 25%,
-      var(--accent-mid, #1a4468) 37%,
-      var(--color-accent-deep) 63%
-    );
-    background-size: 400% 100%;
-    animation: shimmer 1.6s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-accent-deep);
   }
-  @keyframes shimmer {
-    0% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+  .shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      transparent 30%,
+      rgba(54, 146, 211, 0.25) 45%,
+      rgba(54, 146, 211, 0.4) 50%,
+      rgba(54, 146, 211, 0.25) 55%,
+      transparent 70%
+    );
+    background-size: 200% 200%;
+    background-position: -150% -150%;
+    animation: shimmer-diagonal 1.8s ease-in-out infinite;
+  }
+  @keyframes shimmer-diagonal {
+    0% {
+      background-position: -150% -150%;
+    }
+    100% {
+      background-position: 150% 150%;
+    }
   }
 }
 
-.scrollbar-hide::-webkit-scrollbar { display: none; }
-.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

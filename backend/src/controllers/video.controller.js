@@ -165,18 +165,18 @@ const publishAVideo = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Title and description are required")
     }
 
-    const videoFileLocalPath = req.files?.videoFile?.[0]?.path
-    const thumbnailLocalPath = req.files?.thumbnail?.[0]?.path
+    const videoFileBuffer = req.files?.videoFile?.[0]?.buffer
+    const thumbnailBuffer = req.files?.thumbnail?.[0]?.buffer
 
-    if (!videoFileLocalPath) {
+    if (!videoFileBuffer) {
         throw new ApiError(400, "Video file is required")
     }
-    if (!thumbnailLocalPath) {
+    if (!thumbnailBuffer) {
         throw new ApiError(400, "Thumbnail is required")
     }
 
-    const videoFile = await uploadOnCloudinary(videoFileLocalPath)
-    const thumbnail = await uploadOnCloudinary(thumbnailLocalPath)
+    const videoFile = await uploadOnCloudinary(videoFileBuffer)
+    const thumbnail = await uploadOnCloudinary(thumbnailBuffer)
 
     if (!videoFile) {
         throw new ApiError(400, "Failed to upload video file")
@@ -347,9 +347,9 @@ const updateVideo = asyncHandler(async (req, res) => {
     if (description?.trim()) updateData.description = description
 
     // thumbnail is optional - only touch cloudinary if a new one was sent
-     const thumbnailLocalPath = req.file?.path
-    if (thumbnailLocalPath) {
-        const thumbnail = await uploadOnCloudinary(thumbnailLocalPath)
+    const thumbnailBuffer = req.file?.buffer
+    if (thumbnailBuffer) {
+        const thumbnail = await uploadOnCloudinary(thumbnailBuffer)
 
         if (!thumbnail?.url) {
             throw new ApiError(400, "Failed to upload new thumbnail")
@@ -373,7 +373,7 @@ const updateVideo = asyncHandler(async (req, res) => {
 
     return res
     .status(200)
-    .json(new ApiResponse(200, updateVideo, "Video updated successfully"))
+    .json(new ApiResponse(200, updatedVideo, "Video updated successfully"))
 
 })
 

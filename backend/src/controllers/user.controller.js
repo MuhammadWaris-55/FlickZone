@@ -64,23 +64,24 @@ const registerUser = asyncHandler(async (req, res) => {
     // console.log(req.files)
 
     // check for images, avatar , we got req.files from multer(middleware)
-    //this means If files were uploaded, and if there's an avatar, give me the local disk path of the first one
-    const avatarLocalPath = req.files?.avatar?.[0]?.path
-    // const coverImageLocalPath = req.files?.coverImage?.[0]?.path 
+    // NOTE: since multer now uses memoryStorage (for Vercel compatibility), files are
+    // no longer saved to disk — they live in memory as buffers, accessed via .buffer instead of .path
+    const avatarBuffer = req.files?.avatar?.[0]?.buffer
+    // const coverImageBuffer = req.files?.coverImage?.[0]?.buffer 
 
-    let coverImageLocalPath;
+    let coverImageBuffer;
     if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
-        coverImageLocalPath = req.files.coverImage[0].path
+        coverImageBuffer = req.files.coverImage[0].buffer
     }
 
     //check for avatar
-    if (!avatarLocalPath) {
+    if (!avatarBuffer) {
         throw new ApiError(400, "Avatar file is required")
     }
 
     // upload on cloudinary
-    const avatar = await uploadOnCloudinary(avatarLocalPath)
-    const coverImage = await uploadOnCloudinary(coverImageLocalPath)
+    const avatar = await uploadOnCloudinary(avatarBuffer)
+    const coverImage = await uploadOnCloudinary(coverImageBuffer)
 
     //check for avatar again
     if (!avatar) {
@@ -313,16 +314,16 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 })
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
-    // Get the local path of the uploaded avatar file from multer
-    const avatarLocalPath = req.file?.path
+    // Get the buffer of the uploaded avatar file from multer (memoryStorage, not disk anymore)
+    const avatarBuffer = req.file?.buffer
 
     // Validate that a file was actually uploaded
-    if (!avatarLocalPath) {
+    if (!avatarBuffer) {
         throw new ApiError(400, "Avatar file is missing")
     }
 
-    // Upload the local file to Cloudinary and get the result
-    const avatar = await uploadOnCloudinary(avatarLocalPath)
+    // Upload the buffer to Cloudinary and get the result
+    const avatar = await uploadOnCloudinary(avatarBuffer)
 
     // Validate that Cloudinary returned a valid URL
     if (!avatar.url) {
@@ -346,16 +347,16 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 })
 
 const updateUserCoverImage = asyncHandler(async (req, res) => {
-    // Get the local path of the uploaded Cover Image file from multer
-    const coverImageLocalPath = req.file?.path
+    // Get the buffer of the uploaded Cover Image file from multer (memoryStorage, not disk anymore)
+    const coverImageBuffer = req.file?.buffer
 
     // Validate that a file was actually uploaded
-    if (!coverImageLocalPath) {
+    if (!coverImageBuffer) {
         throw new ApiError(400, "Cover Image file is missing")
     }
 
-    // Upload the local file to Cloudinary and get the result
-    const coverImage = await uploadOnCloudinary(coverImageLocalPath)
+    // Upload the buffer to Cloudinary and get the result
+    const coverImage = await uploadOnCloudinary(coverImageBuffer)
 
     // Validate that Cloudinary returned a valid URL
     if (!coverImage.url) {

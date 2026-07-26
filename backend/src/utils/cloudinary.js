@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
-import fs from "fs"
+import streamifier from "streamifier";
 
 // Configuration
 cloudinary.config({
@@ -9,19 +9,27 @@ cloudinary.config({
 });
 
 
-const uploadOnCloudinary = async (localFilePath) => {
+const uploadOnCloudinary = async (fileBuffer) => {
     try {
-        if (!localFilePath) return null
-        //upload the file on cloudinary
-        const response = await cloudinary.uploader.upload(localFilePath, {
-            resource_type: "auto" //it will automatically detects what type of file it is
+        if (!fileBuffer) return null
+
+        //upload the buffer to cloudinary via stream
+        const response = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+                { resource_type: "auto" }, //it will automatically detects what type of file it is
+                (error, result) => {
+                    if (error) return reject(error);
+                    resolve(result);
+                }
+            )
+            streamifier.createReadStream(fileBuffer).pipe(uploadStream)
         })
+
         //file has been uploaded successfully
         // console.log("File is Uploaded on Cloudinary", response.url) //this will give us the public url of file that uploaded on cloudinary
-        fs.unlinkSync(localFilePath) //this will remove the file if it has uploaded
         return response;
     } catch (error) {
-        fs.unlinkSync(localFilePath) //this will remove the locally saved temporary file as the upload operation got failed
+        console.log("Error uploading to cloudinary:", error)
         return null;
     }
 }

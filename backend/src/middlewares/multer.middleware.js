@@ -1,12 +1,10 @@
 import multer from "multer";
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) { //cb is a callback
-        cb(null, "./public/temp")
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.originalname)
+const storage = multer.memoryStorage();
+
+export const upload = multer({
+    storage,
+    limits: {
+        fileSize: 100 * 1024 * 1024 // 100MB max — adjust based on your largest expected video size
     }
 })
-
-export const upload = multer({ storage })

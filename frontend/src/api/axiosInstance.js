@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "/api/v1", // proxied by vite in dev
+  // baseURL: "/api/v1", // proxied by vite in dev
+  baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true, // sends httpOnly cookies
   headers: {
     "Content-Type": "application/json",

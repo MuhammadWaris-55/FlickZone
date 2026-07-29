@@ -141,25 +141,24 @@
   .shimmer::after {
     content: "";
     position: absolute;
-    inset: 0;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
     background: linear-gradient(
       135deg,
-      transparent 30%,
-      rgba(54, 146, 211, 0.25) 45%,
-      rgba(54, 146, 211, 0.4) 50%,
-      rgba(54, 146, 211, 0.25) 55%,
-      transparent 70%
+      transparent 40%,
+      rgba(255, 255, 255, 0.08) 50%,
+      transparent 60%
     );
-    background-size: 200% 200%;
-    background-position: -150% -150%;
-    animation: shimmer-diagonal 1.8s ease-in-out infinite;
+    animation: shimmer-sweep 1.6s linear infinite;
   }
-  @keyframes shimmer-diagonal {
+  @keyframes shimmer-sweep {
     0% {
-      background-position: -150% -150%;
+      transform: translate(-50%, -50%);
     }
     100% {
-      background-position: 150% 150%;
+      transform: translate(50%, 50%);
     }
   }
 }

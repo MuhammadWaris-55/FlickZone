@@ -6,8 +6,21 @@ import cors from "cors";
 const app = express();
 
 //Configuring CORS
+// CORS_ORIGIN can contain multiple comma-separated URLs (e.g. localhost for dev + deployed frontend for prod)
+// browsers only accept ONE origin value in the response header, so we can't pass the raw comma-separated
+// string directly into cors() - instead we split it into a list and dynamically check the incoming
+// request's origin against that list, returning just the matching one
+const allowedOrigins = process.env.CORS_ORIGIN.split(",").map(origin => origin.trim())
+
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: function (origin, callback) {
+        // allow requests with no origin (like mobile apps, curl, or Postman) since they don't send an origin header
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true)
+        } else {
+            callback(new Error("Not allowed by CORS"))
+        }
+    },
     credentials: true
 }))
 
@@ -52,6 +65,6 @@ app.use("/api/v1/likes", likeRouter)
 app.use("/api/v1/playlist", playlistRouter)
 app.use("/api/v1/subscriptions", subscriptionRouter)
 app.use("/api/v1/dashboard", dashboardRouter)
-app.use("/api/v1/healthcheck" , healthcheckRouter)
+app.use("/api/v1/healthcheck", healthcheckRouter)
 
 export { app }

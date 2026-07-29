@@ -8,10 +8,10 @@ const connectDB = async () => {
         //.connection.host just tells you which server/machine your app connected to.
     } catch (error) {
         console.log("MongoDB Connection Error :" + error)
-        process.exit(1)
-        //process is Node's way of referring to your currently running app.
-        //process.exit() means → "stop the app right now"
-        //The number 1 is the exit code, which signals that the app stopped due to an error
+        // process.exit(1) is removed here — on Vercel's serverless environment, killing the
+        // process abruptly produces confusing crash logs instead of a clean error response.
+        // Throwing lets the caller (api/index.js) handle it and Vercel return a proper error.
+        throw error
     }
 }
 

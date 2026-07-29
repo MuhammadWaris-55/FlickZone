@@ -157,7 +157,8 @@ const loginUser = asyncHandler(async (req, res) => {
     //by doing this cookies will only be modified by server not from anyone on frontend
     const options = {
         httpOnly: true,
-        secure: true
+        secure: true,
+        sameSite: "none"
     }
 
     return res
@@ -233,7 +234,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
         const options = {
             httpOnly: true,
-            secure: true
+            secure: true,
+            sameSite: "none"
         }
 
         // Generate a fresh access token and a new refresh token (old one gets replaced in DB)

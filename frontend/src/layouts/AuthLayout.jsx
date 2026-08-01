@@ -1,9 +1,12 @@
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import { useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Logo from "@/components/Logo";
 
 export default function AuthLayout() {
+  const location = useLocation();
+  const isRegister = location.pathname === "/register";
+
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
@@ -57,7 +60,11 @@ export default function AuthLayout() {
       </div>
 
       {/* Form panel — only this side scrolls */}
-      <div className="flex-1 h-screen overflow-y-auto flex flex-col items-center justify-center px-6 py-10 relative">
+      <div
+        className={`flex-1 h-screen overflow-y-auto flex flex-col items-center px-6 relative ${
+          isRegister ? "justify-start pt-16 pb-10" : "justify-center py-10"
+        }`}
+      >
         <div className="lg:hidden mb-6">
           <Logo />
         </div>

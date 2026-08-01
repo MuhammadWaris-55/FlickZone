@@ -155,10 +155,16 @@ const loginUser = asyncHandler(async (req, res) => {
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 
     //by doing this cookies will only be modified by server not from anyone on frontend
+    // const options = {
+    //     httpOnly: true,
+    //     secure: true,
+    //     sameSite: "none"
+    // }
+
     const options = {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none"
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     }
 
     return res
@@ -191,9 +197,15 @@ const logoutUser = asyncHandler(async (req, res) => {
         }
     )
 
+    // const options = {
+    //     httpOnly: true,
+    //     secure: true
+    // }
+
     const options = {
-        httpOnly: true,
-        secure: true
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     }
 
     // Send success response and clear both cookies from the browser
@@ -232,10 +244,16 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             throw new ApiError(401, "Refresh token is expired or used")
         }
 
+        // const options = {
+        //     httpOnly: true,
+        //     secure: true,
+        //     sameSite: "none"
+        // }
+
         const options = {
-            httpOnly: true,
-            secure: true,
-            sameSite: "none"
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         }
 
         // Generate a fresh access token and a new refresh token (old one gets replaced in DB)

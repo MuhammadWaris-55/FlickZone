@@ -1,17 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  Search,
-  User,
-  LayoutDashboard,
-  LogOut,
-  Upload,
-} from "lucide-react";
+import { Search, User, LayoutDashboard, LogOut, Upload } from "lucide-react";
 import { Settings as SettingsIcon } from "lucide-react";
 import NotificationsDropdown from "@/components/NotificationsDropdown";
 import { useAuth } from "@/context/AuthContext";
 import { searchVideos } from "@/api/videoApi";
+import { useBreakpoint } from "@/hooks/useBreakpoint";
+import { ArrowLeft } from "lucide-react";
 
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -20,6 +16,8 @@ export default function Navbar() {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const isMobile = useBreakpoint();
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -59,53 +57,138 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-30 h-16 flex items-center gap-4 px-4 md:px-6 bg-background/50 backdrop-blur-2xl border-b border-white/[0.06]">
       {/* Search */}
-      <form onSubmit={handleSearch} className="flex-1 max-w-xl relative group">
-        <Search
-          size={17}
-          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-accent transition-colors"
-        />
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onFocus={() => setShowSuggestions(true)}
-          onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-          placeholder="Search FlickZone..."
-          className="w-full bg-card/40 border border-border rounded-full pl-10 pr-4 py-2 text-sm outline-none
-                     focus:border-accent focus:bg-card/70 transition-all duration-200"
-        />
+      {isMobile ? (
+        <>
+          <button
+            onClick={() => setMobileSearchOpen(true)}
+            className="flex items-center gap-2 bg-card/40 border border-border rounded-full px-3 py-2 text-sm text-muted-foreground flex-1 max-w-[180px]"
+          >
+            <Search size={16} />
+            <span className="truncate">Search</span>
+          </button>
 
-        <AnimatePresence>
-          {showSuggestions && suggestions.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.15 }}
-              className="absolute top-full mt-2 w-full bg-card/90 backdrop-blur-2xl border border-white/[0.08] rounded-xl shadow-2xl overflow-hidden z-50"
-            >
-              {suggestions.map((video) => (
-                <button
-                  key={video._id}
-                  type="button"
-                  onClick={() => {
-                    navigate(`/watch/${video._id}`);
-                    setShowSuggestions(false);
-                    setSearch("");
+          <AnimatePresence>
+            {mobileSearchOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                className="fixed inset-0 bg-background z-[60] flex flex-col"
+              >
+                <form
+                  onSubmit={(e) => {
+                    handleSearch(e);
+                    setMobileSearchOpen(false);
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-white/[0.05] transition-colors"
+                  className="flex items-center gap-2 p-3 border-b border-white/[0.06]"
                 >
-                  <img
-                    src={video.thumbnail}
-                    alt=""
-                    className="w-14 h-9 rounded object-cover shrink-0"
-                  />
-                  <span className="text-xs truncate">{video.title}</span>
-                </button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </form>
+                  <button
+                    type="button"
+                    onClick={() => setMobileSearchOpen(false)}
+                    className="p-2 rounded-full hover:bg-white/[0.06] transition-colors shrink-0"
+                  >
+                    <ArrowLeft size={20} />
+                  </button>
+                  <div className="relative flex-1">
+                    <Search
+                      size={17}
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    />
+                    <input
+                      autoFocus
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="Search FlickZone..."
+                      className="w-full bg-card/60 border border-border rounded-full pl-10 pr-4 py-2.5 text-sm outline-none focus:border-accent transition-colors"
+                    />
+                  </div>
+                </form>
+
+                <div className="flex-1 overflow-y-auto">
+                  {suggestions.length > 0
+                    ? suggestions.map((video) => (
+                        <button
+                          key={video._id}
+                          onClick={() => {
+                            navigate(`/watch/${video._id}`);
+                            setMobileSearchOpen(false);
+                            setSearch("");
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-white/[0.05] transition-colors border-b border-white/[0.04]"
+                        >
+                          <img
+                            src={video.thumbnail}
+                            alt=""
+                            className="w-16 h-10 rounded object-cover shrink-0"
+                          />
+                          <span className="text-sm truncate">
+                            {video.title}
+                          </span>
+                        </button>
+                      ))
+                    : search.trim().length >= 2 && (
+                        <p className="px-4 py-6 text-sm text-muted-foreground text-center">
+                          No results found.
+                        </p>
+                      )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
+      ) : (
+        <form
+          onSubmit={handleSearch}
+          className="flex-1 max-w-xl relative group"
+        >
+          <Search
+            size={17}
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-accent transition-colors"
+          />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onFocus={() => setShowSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+            placeholder="Search FlickZone..."
+            className="w-full bg-card/40 border border-border rounded-full pl-10 pr-4 py-2 text-sm outline-none
+                 focus:border-accent focus:bg-card/70 transition-all duration-200"
+          />
+
+          <AnimatePresence>
+            {showSuggestions && suggestions.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.15 }}
+                className="absolute top-full mt-2 w-full bg-card/90 backdrop-blur-2xl border border-white/[0.08] rounded-xl shadow-2xl overflow-hidden z-50"
+              >
+                {suggestions.map((video) => (
+                  <button
+                    key={video._id}
+                    type="button"
+                    onClick={() => {
+                      navigate(`/watch/${video._id}`);
+                      setShowSuggestions(false);
+                      setSearch("");
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-white/[0.05] transition-colors"
+                  >
+                    <img
+                      src={video.thumbnail}
+                      alt=""
+                      className="w-14 h-9 rounded object-cover shrink-0"
+                    />
+                    <span className="text-xs truncate">{video.title}</span>
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </form>
+      )}
 
       <div className="flex-1" />
 

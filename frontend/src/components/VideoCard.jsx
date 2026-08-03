@@ -90,7 +90,7 @@ export default function VideoCard({ video, index = 0 }) {
               />
             </Link>
           )}
-          <div className="min-w-0">
+          <div className="min-w-0 flex flex-col">
             <h3 className="font-body font-medium text-sm line-clamp-2 leading-snug">
               {video.title}
             </h3>

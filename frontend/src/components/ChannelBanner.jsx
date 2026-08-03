@@ -9,6 +9,7 @@ export default function ChannelBanner({ channel }) {
     offset: ["start start", "end start"],
   });
   const bannerY = useTransform(scrollYProgress, [0, 1], ["0%", "25%"]);
+  const avatarY = useTransform(scrollYProgress, [0, 1], ["0%", "60%"]);
 
   return (
     <div ref={ref}>
@@ -27,15 +28,17 @@ export default function ChannelBanner({ channel }) {
       </div>
 
       <div className="relative -mt-14 md:-mt-16 px-6 flex flex-col md:flex-row md:items-end gap-4">
-        <motion.img
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          whileHover={{ scale: 1.04 }}
-          src={channel.avatar}
-          alt={channel.username}
-          className="w-28 h-28 rounded-full object-cover border-4 border-background shadow-[0_0_30px_-5px_var(--color-accent)] relative z-10"
-        />
+        <motion.div style={{ y: avatarY }} className="relative z-10">
+          <motion.img
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            whileHover={{ scale: 1.04 }}
+            src={channel.avatar}
+            alt={channel.username}
+            className="w-28 h-28 rounded-full object-cover border-4 border-background shadow-[0_0_30px_-5px_var(--color-accent)]"
+          />
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 10 }}

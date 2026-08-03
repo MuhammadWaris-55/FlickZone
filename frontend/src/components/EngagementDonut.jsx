@@ -9,8 +9,8 @@ export default function EngagementDonut({ data }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.4 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
       className="bg-card/40 backdrop-blur-xl border border-white/[0.08] rounded-2xl p-5 md:p-6 flex flex-col"
     >
       <h3 className="font-heading font-semibold text-sm mb-4">

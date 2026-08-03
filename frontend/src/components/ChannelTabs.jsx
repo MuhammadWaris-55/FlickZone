@@ -4,7 +4,7 @@ const TABS = ["Videos", "Playlists", "Tweets", "Subscribed"];
 
 export default function ChannelTabs({ activeTab, onTabChange }) {
   return (
-    <div className="relative flex border-b border-border mt-6 px-6 gap-2 overflow-x-auto">
+    <div className="sticky top-16 z-30 bg-background/80 backdrop-blur-xl relative flex border-b border-border mt-6 px-6 gap-2 overflow-x-auto transition-all duration-200">
       {TABS.map((tab) => (
         <button
           key={tab}

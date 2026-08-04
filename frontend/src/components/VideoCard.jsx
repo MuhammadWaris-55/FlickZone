@@ -11,16 +11,14 @@ export default function VideoCard({ video, index = 0 }) {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [8, -8]), {
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [6, -6]), {
     stiffness: 200,
     damping: 20,
   });
-  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-8, 8]), {
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-6, 6]), {
     stiffness: 200,
     damping: 20,
   });
-  const glowX = useTransform(mouseX, [-0.5, 0.5], ["0%", "100%"]);
-  const glowY = useTransform(mouseY, [-0.5, 0.5], ["0%", "100%"]);
 
   const handleMouseMove = (e) => {
     const rect = ref.current.getBoundingClientRect();
@@ -47,18 +45,11 @@ export default function VideoCard({ video, index = 0 }) {
         onMouseLeave={handleMouseLeave}
         onClick={() => navigate(`/watch/${video._id}`)}
         style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-        className="group relative rounded-xl overflow-hidden bg-card border border-border transition-shadow duration-300 hover:shadow-[0_20px_50px_-12px_var(--color-accent)] cursor-pointer"
+        className="group relative rounded-xl p-2 -m-2 cursor-pointer transition-colors duration-200 hover:bg-card/50"
       >
-        {/* Cursor-tracking glow */}
-        <motion.div
-          style={{
-            background: `radial-gradient(circle at ${glowX} ${glowY}, var(--color-accent) 0%, transparent 60%)`,
-          }}
-          className="absolute inset-0 opacity-0 group-hover:opacity-15 transition-opacity duration-300 pointer-events-none z-10"
-        />
-
+        {/* Thumbnail — no card border, just the image itself */}
         <div
-          className="relative aspect-video overflow-hidden bg-accent-deep"
+          className="relative aspect-video overflow-hidden rounded-xl bg-accent-deep"
           style={{ transform: "translateZ(20px)" }}
         >
           <img
@@ -73,8 +64,9 @@ export default function VideoCard({ video, index = 0 }) {
           )}
         </div>
 
+        {/* Info row — sits directly on background, no card box */}
         <div
-          className="p-3 flex gap-3 relative z-10"
+          className="flex gap-3 mt-3"
           style={{ transform: "translateZ(10px)" }}
         >
           {video.owner?.avatar && (
@@ -86,7 +78,7 @@ export default function VideoCard({ video, index = 0 }) {
               <img
                 src={video.owner.avatar}
                 alt={video.owner.username}
-                className="w-9 h-9 rounded-full object-cover ring-1 ring-border hover:ring-accent transition-colors"
+                className="w-9 h-9 rounded-full object-cover"
               />
             </Link>
           )}

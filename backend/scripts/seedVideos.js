@@ -1,3 +1,9 @@
+// scripts/seedVideos.js
+// Seeds the database with sample videos (fetched from Pexels API, uploaded to Cloudinary)
+// for local/dev testing purposes. Attributes all videos to a single existing user account.
+// Run: node scripts/seedVideos.js
+// Requires PEXELS_API_KEY, CLOUDINARY_* and MONGODB_URI to be set in .env
+
 import "dotenv/config";
 import mongoose from "mongoose";
 import axios from "axios";

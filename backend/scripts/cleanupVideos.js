@@ -1,3 +1,10 @@
+// scripts/cleanupVideos.js
+// Deletes all videos belonging to UPLOADER_USERNAME (used by seedVideos.js) from both
+// MongoDB and Cloudinary. Use this before re-running seedVideos.js to avoid duplicate data.
+// WARNING: This deletes ALL videos owned by the given user, including real uploads
+//if that account has any. Double-check UPLOADER_USERNAME and MONGODB_URI before running.
+// Run: node scripts/cleanupVideos.js
+
 import "dotenv/config";
 import mongoose from "mongoose";
 import { v2 as cloudinary } from "cloudinary";
